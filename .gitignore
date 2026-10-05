@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Next.js / Build Output
+.next/
+out/
+build/
+
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Mastra (local runtime state)
+.mastra/
+/repomix-output.xml
+
+# Database Files (SQLite)
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel
+
+# Coverage / Testing
+coverage/
+
+# Misc
+*.pem
