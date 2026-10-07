@@ -53,11 +53,18 @@ Document Content:
 ${context}
 
 Guidelines:
-1. Every question must be concrete and directly testable from the document material.
-2. Provide exactly 4 distinct and plausible options (A, B, C, D) for each question.
-3. Indicate the zero-indexed correct answer (0 for A, 1 for B, 2 for C, 3 for D).
-4. Provide a clear, educational explanation (keep concise: 1-2 sentences) citing the exact concept or excerpt from the manual.
-5. Keep questions and options concise and avoid conversational filler.
+1. Grounding: Every question must be concrete and directly testable from the document material.
+2. Calculation & Quantitative Problem Solving (CRITICAL):
+   - If the source document contains formulas, physical laws, equations, quantitative principles, or numerical relationships (e.g., Physics, Engineering, Chemistry, Statistics, Mathematics, Economics):
+     * Do NOT generate only theoretical or definitional questions.
+     * You MUST include calculation and formula-application questions where students are given realistic numerical values and must solve a problem using the formulas given in the text.
+     * Specify all numerical parameters and units clearly in the question stem.
+     * Design distractors representing common calculation pitfalls (e.g. inverted formula, sign error, missing factor of 1/2 or square power, unit conversion error).
+     * In the explanation, include the explicit formula, the step-by-step numerical substitution, and the final calculated answer with units.
+3. Provide exactly 4 distinct and plausible options (A, B, C, D) for each question.
+4. Indicate the zero-indexed correct answer (0 for A, 1 for B, 2 for C, 3 for D).
+5. Provide a clear, educational explanation (1-3 sentences) citing the exact concept or excerpt from the manual, and detailing the step-by-step mathematical working for calculation questions.
+6. Keep questions and options concise and avoid conversational filler.
 
 Respond ONLY with a JSON object in this format (no markdown code blocks, no other text):
 {
@@ -118,17 +125,17 @@ export async function generateExamFromDocument(params: GenerateExamParams): Prom
     // 2. Attempt AI Generation via OpenRouter if key is available
     if (process.env.OPENROUTER_API_KEY) {
         try {
-            const { examExaminerAgent } = await import("@/mastra/agents/exam-examiner-agent");
+            const { examAgent } = await import("@/mastra/agents/exam-agent");
 
             const contextText = resourceTexts
                 .map((d) => `--- DOCUMENT: ${d.name} ---\n${d.text.slice(0, 14000)}`)
                 .join("\n\n");
 
             const difficultyGuide = {
-                easy: "Focus on foundational definitions, formula identification, and basic concept recall directly mentioned in the text.",
-                medium: "Focus on applied scenarios, multi-step comprehension, interpreting tables/data, and practical problem solving.",
-                hard: "Focus on complex edge cases, error diagnosis, synthesizing multi-chapter concepts, and challenging analytical deductions.",
-                standard: "Provide a balanced university examination: ~30% foundational recall, ~50% applied problem-solving, and ~20% challenging analysis.",
+                easy: "Focus on foundational definitions, formula identification, direct single-step calculations with clean numbers, and basic concept recall directly mentioned in the text.",
+                medium: "Focus on applied scenarios, multi-step problem solving, formula rearrangement to calculate unknown values, interpreting tables/data, and practical calculations.",
+                hard: "Focus on complex edge cases, multi-step formula calculations, error diagnosis, synthesizing multi-chapter concepts, and challenging analytical deductions.",
+                standard: "Provide a balanced university examination: ~30% foundational recall & basic formulas, ~50% applied problem-solving and calculations, and ~20% challenging analysis.",
             }[difficulty];
 
             if (questionCount > 20) {
@@ -141,8 +148,8 @@ export async function generateExamFromDocument(params: GenerateExamParams): Prom
                 const part2Context = contextText.slice(Math.max(0, halfLength - 2000));
 
                 const [b1, b2] = await Promise.allSettled([
-                    generateAIBatch(examExaminerAgent, part1Context, batch1Count, difficulty, difficultyGuide, finalTitle, finalCourse, 1),
-                    generateAIBatch(examExaminerAgent, part2Context, batch2Count, difficulty, difficultyGuide, finalTitle, finalCourse, 2),
+                    generateAIBatch(examAgent, part1Context, batch1Count, difficulty, difficultyGuide, finalTitle, finalCourse, 1),
+                    generateAIBatch(examAgent, part2Context, batch2Count, difficulty, difficultyGuide, finalTitle, finalCourse, 2),
                 ]);
 
                 const q1 = b1.status === "fulfilled" ? b1.value : [];
@@ -151,7 +158,7 @@ export async function generateExamFromDocument(params: GenerateExamParams): Prom
                 generatedQuestions = [...q1, ...q2];
             } else {
                 generatedQuestions = await generateAIBatch(
-                    examExaminerAgent,
+                    examAgent,
                     contextText,
                     questionCount,
                     difficulty,
@@ -202,10 +209,141 @@ export async function generateExamFromDocument(params: GenerateExamParams): Prom
     return exam;
 }
 
+interface FormulaQuestionTemplate {
+    question: string;
+    options: [string, string, string, string]; // First option is correct before shuffling
+    explanation: string;
+    sourceExcerpt: string;
+}
+
 /**
- * Deterministic question synthesizer that extracts sentences, key terms,
- * concepts, and numerical facts from the document text to construct
- * realistic multiple choice questions.
+ * Scans document sentences for formulas, physical laws, equations, or quantitative
+ * relationships and synthesizes realistic calculation problems with authentic distractors
+ * and step-by-step explanations.
+ */
+function detectCalculationQuestions(
+    sentences: string[],
+    docName: string,
+    difficulty: ExamDifficulty
+): FormulaQuestionTemplate[] {
+    const calcQuestions: FormulaQuestionTemplate[] = [];
+
+    for (const sentence of sentences) {
+        // 1. Newton's second law or general multiplication: Target = Var1 * Var2
+        const mulMatch = sentence.match(/\b([A-Z][a-zA-Z0-9_]*)\s*=\s*([a-zA-Z0-9_]+)\s*[*·x]\s*([a-zA-Z0-9_]+)\b/);
+        if (mulMatch) {
+            const [, target, v1, v2] = mulMatch;
+            const isForce = /force|newton/i.test(sentence) || (target === "F" && v1 === "m" && v2 === "a");
+            const isWork = /work/i.test(sentence) || (target === "W" && v1 === "F" && v2 === "d");
+            const isVoltage = /voltage|ohm|resistance|current/i.test(sentence) || (target === "V" && v1 === "I" && v2 === "R");
+            const isPower = /power/i.test(sentence) || (target === "P" && v1 === "I" && v2 === "V");
+
+            if (isForce) {
+                // Forward problem: F = m * a
+                const m = difficulty === "hard" ? 12 : 5;
+                const a = difficulty === "hard" ? 6 : 4;
+                const correct = m * a;
+                calcQuestions.push({
+                    question: `Calculation Problem: Based on ${mulMatch[0]} from the text, if a body has a mass of ${m} kg and experiences an acceleration of ${a} m/s², what is the net force F acting on the body?`,
+                    options: [`${correct} N`, `${m + a} N`, `${Math.abs(m - a)} N`, `${(m / a).toFixed(2)} N`],
+                    explanation: `Using the formula ${mulMatch[0]}: F = (${m} kg) * (${a} m/s²) = ${correct} N. Options with ${m + a} N, ${Math.abs(m - a)} N, and ${(m / a).toFixed(2)} N represent common addition, subtraction, and ratio inversion calculation pitfalls.`,
+                    sourceExcerpt: sentence,
+                });
+
+                // Inverse problem: solving for acceleration a = F / m
+                const F_val = difficulty === "hard" ? 72 : 36;
+                const m_val = difficulty === "hard" ? 8 : 6;
+                const a_correct = F_val / m_val;
+                calcQuestions.push({
+                    question: `Calculation Problem: A constant net force of ${F_val} N acts on an object with a mass of ${m_val} kg. Using ${mulMatch[0]}, calculate the resulting acceleration a.`,
+                    options: [`${a_correct} m/s²`, `${F_val * m_val} m/s²`, `${F_val - m_val} m/s²`, `${F_val + m_val} m/s²`],
+                    explanation: `Rearranging ${mulMatch[0]} to solve for acceleration yields a = F / m = ${F_val} N / ${m_val} kg = ${a_correct} m/s². The other choices reflect multiplication (${F_val * m_val}) and arithmetic errors.`,
+                    sourceExcerpt: sentence,
+                });
+            } else if (isWork) {
+                const F = 15;
+                const d = 6;
+                const W = F * d;
+                calcQuestions.push({
+                    question: `Calculation Problem: According to the principle of work (${mulMatch[0]}), if a constant force of ${F} N moves an object through a displacement of ${d} m in its direction, what is the work done?`,
+                    options: [`${W} J`, `${F + d} J`, `${F - d} J`, `${(F / d).toFixed(1)} J`],
+                    explanation: `Using W = F * d: W = ${F} N * ${d} m = ${W} J. Distractors represent addition (${F + d} J), subtraction, and division.`,
+                    sourceExcerpt: sentence,
+                });
+            } else if (isVoltage) {
+                const I = 3;
+                const R = 8;
+                const V = I * R;
+                calcQuestions.push({
+                    question: `Calculation Problem: Using the relationship ${mulMatch[0]}, what is the voltage drop across a resistor of ${R} Ω carrying an electric current of ${I} A?`,
+                    options: [`${V} V`, `${I + R} V`, `${(R / I).toFixed(1)} V`, `${R - I} V`],
+                    explanation: `Using V = I * R: V = ${I} A * ${R} Ω = ${V} V. Other options reflect addition, subtraction, or inverted ratios.`,
+                    sourceExcerpt: sentence,
+                });
+            } else {
+                // Generic multiplication formula
+                const val1 = difficulty === "hard" ? 14 : 7;
+                const val2 = difficulty === "hard" ? 5 : 3;
+                const result = val1 * val2;
+                calcQuestions.push({
+                    question: `Calculation Problem: Based on the formula ${mulMatch[0]} documented in ${docName}, if ${v1} = ${val1} and ${v2} = ${val2}, calculate the value of ${target}.`,
+                    options: [`${result} units`, `${val1 + val2} units`, `${val1 - val2} units`, `${(val1 / val2).toFixed(2)} units`],
+                    explanation: `Applying the formula ${mulMatch[0]}: ${target} = ${val1} * ${val2} = ${result}. Distractors represent common computational slip-ups (addition, subtraction, division).`,
+                    sourceExcerpt: sentence,
+                });
+            }
+        }
+
+        // 2. Division formula: Target = Var1 / Var2
+        const divMatch = sentence.match(/\b([A-Z][a-zA-Z0-9_]*)\s*=\s*([a-zA-Z0-9_]+)\s*\/\s*([a-zA-Z0-9_]+)\b/);
+        if (divMatch) {
+            const [, target, v1, v2] = divMatch;
+            const val1 = 60;
+            const val2 = 12;
+            const result = val1 / val2;
+            calcQuestions.push({
+                question: `Calculation Problem: Using the relationship ${divMatch[0]} given in ${docName}, calculate ${target} when ${v1} = ${val1} and ${v2} = ${val2}.`,
+                options: [`${result} units`, `${val1 * val2} units`, `${val1 - val2} units`, `${(val2 / val1).toFixed(2)} units`],
+                explanation: `Applying ${divMatch[0]}: ${target} = ${val1} / ${val2} = ${result}. Distractors include multiplying (${val1 * val2}) and inverting the quotient (${(val2 / val1).toFixed(2)}).`,
+                sourceExcerpt: sentence,
+            });
+        }
+
+        // 3. Kinetic energy (KE = 1/2 m v^2)
+        if (/kinetic\s+energy/i.test(sentence) && (/mass/i.test(sentence) || /velocity/i.test(sentence))) {
+            const m = 4;
+            const v = 3;
+            const correctKE = 0.5 * m * (v * v); // 18 J
+            calcQuestions.push({
+                question: `Calculation Problem: An object with a mass of ${m} kg is travelling at a velocity of ${v} m/s. According to the formula for kinetic energy (KE = 1/2 * m * v²), what is its kinetic energy?`,
+                options: [`${correctKE} J`, `${m * (v * v)} J`, `${m * v} J`, `${0.5 * m * v} J`],
+                explanation: `Using KE = 1/2 * m * v²: KE = 0.5 * (${m} kg) * (${v} m/s)² = 0.5 * ${m} * ${v * v} = ${correctKE} J. ${m * (v * v)} J omits the 1/2 factor, while ${m * v} J and ${0.5 * m * v} J fail to square the velocity.`,
+                sourceExcerpt: sentence,
+            });
+        }
+
+        // 4. Carnot efficiency (eta = 1 - Tc / Th)
+        if (/carnot\s+efficiency/i.test(sentence) || (/heat\s+engine/i.test(sentence) && /temperature/i.test(sentence))) {
+            const Th = 500;
+            const Tc = 300;
+            const eff = ((1 - Tc / Th) * 100).toFixed(0);
+            const wrong1 = ((Tc / Th) * 100).toFixed(0);
+            calcQuestions.push({
+                question: `Calculation Problem: A theoretical ideal Carnot heat engine operates between a high-temperature reservoir at ${Th} K and a low-temperature sink at ${Tc} K. What is its maximum thermal efficiency?`,
+                options: [`${eff}%`, `${wrong1}%`, "25%", "15%"],
+                explanation: `Carnot efficiency is η = 1 - (T_cold / T_hot) = 1 - (${Tc} / ${Th}) = 1 - 0.60 = 0.40 or ${eff}%. The ${wrong1}% distractor represents calculating T_cold / T_hot without subtracting from 1.`,
+                sourceExcerpt: sentence,
+            });
+        }
+    }
+
+    return calcQuestions;
+}
+
+/**
+ * Deterministic question synthesizer that extracts formulas, calculations,
+ * sentences, key terms, and concepts from the document text to construct
+ * realistic multiple choice examination questions.
  */
 function synthesizeQuestionsFromDocument(
     docs: ResourceDocumentText[],
@@ -229,9 +367,38 @@ function synthesizeQuestionsFromDocument(
         .map((p) => p.trim())
         .filter((p) => p.length >= 80);
 
-    let sentenceIndex = 0;
     let counter = questions.length + 1;
 
+    // 1. Detect and integrate quantitative calculation questions if formulas exist
+    const formulaTemplates = detectCalculationQuestions(sentences, docName, difficulty);
+    const maxCalcQuestions = Math.min(
+        formulaTemplates.length,
+        Math.max(1, Math.floor(targetCount * 0.4))
+    );
+
+    for (let i = 0; i < maxCalcQuestions && questions.length < targetCount; i++) {
+        const tmpl = formulaTemplates[i];
+        // Shuffle options deterministically
+        const correctIndex = (counter * 5) % 4;
+        const shuffled: [string, string, string, string] = [...tmpl.options];
+        const temp = shuffled[0];
+        shuffled[0] = shuffled[correctIndex];
+        shuffled[correctIndex] = temp;
+
+        questions.push({
+            id: `q_${counter}`,
+            question: tmpl.question,
+            options: shuffled,
+            correctAnswer: correctIndex,
+            explanation: tmpl.explanation,
+            sourceExcerpt: tmpl.sourceExcerpt,
+        });
+
+        counter++;
+    }
+
+    // 2. Synthesize conceptual and definitional questions from document sentences
+    let sentenceIndex = 0;
     while (questions.length < targetCount && sentenceIndex < sentences.length) {
         const sentence = sentences[sentenceIndex++];
         const words = sentence.split(/\s+/);
@@ -280,7 +447,7 @@ function synthesizeQuestionsFromDocument(
         counter++;
     }
 
-    // If still need more questions, generate conceptual synthesis questions
+    // 3. If still need more questions, generate conceptual synthesis questions
     while (questions.length < targetCount) {
         const p = paragraphs[counter % paragraphs.length] || combinedText.slice(0, 200);
         const snippet = p.slice(0, 140).replace(/\s+/g, " ");
