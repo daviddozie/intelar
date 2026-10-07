@@ -16,15 +16,19 @@ import { buildGlukInstructions } from "./gluk-instructions";
 import { getSystemTemporalContext } from "@/lib/temporal";
 
 const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY!,
+    apiKey: process.env.OPENROUTER_API_KEY || "gluk-local-key",
 });
 
+const tursoUrl = process.env.TURSO_DATABASE_URL?.trim();
+
 const memory = new Memory({
-    storage: new LibSQLStore({
-        id: "gluk-memory",
-        url: process.env.TURSO_DATABASE_URL!,
-        authToken: process.env.TURSO_AUTH_TOKEN,
-    }),
+    storage: tursoUrl
+        ? new LibSQLStore({
+            id: "gluk-memory",
+            url: tursoUrl,
+            authToken: process.env.TURSO_AUTH_TOKEN,
+        })
+        : undefined,
     options: {
         lastMessages: 40,
     },

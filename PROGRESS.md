@@ -205,7 +205,16 @@ Structured usability trials were conducted with 4 Nigerian university students u
   - `/api/mcp/browse`: POST endpoint for authenticated source browsing.
   - `/api/mcp/ingest`: POST endpoint for batch document ingestion into SQLite and vector store.
   - Supported `data:` and `raw.githubusercontent.com` URLs in `document-processor.ts`.
-- **Automated Verification**: `npm run check:mcp` (8/8 tests passed).
+- **Automated Verification**: `npm run check:mcp` (9/9 tests passed).
+
+## Exam Agent Quantitative & Calculation Questions (Completed)
+- **Feature**: Extended Exam Agent (`exam-agent.ts`, `examAgent`) and exam generator (`exam-generator.ts`) to actively generate calculation / quantitative problem-solving questions when documents contain formulas, physical laws, equations, or numerical relationships (e.g. physics, engineering, chemistry, statistics, mathematics).
+- **Rules & Instructions**:
+  - Updated `EXAM_AGENT_BASE_INSTRUCTIONS` in `src/mastra/agents/exam-agent.ts` with Rule 2: Mandatory quantitative problem solving, supplying realistic numbers and standard units in prompts rather than solely theoretical questions, designing common calculation pitfall distractors (sign errors, inverted ratios, missing exponents), and requiring step-by-step mathematical working in explanations.
+  - Updated `generateAIBatch` prompt and difficulty guides in `src/lib/exam-generator.ts`.
+  - Added formula extraction and calculation synthesis (`detectCalculationQuestions`) to `synthesizeQuestionsFromDocument` in `src/lib/exam-generator.ts` for physics formulas (e.g. Newton's laws $F=ma$, work $W=Fd$, kinetic energy $KE=\frac{1}{2}mv^2$, Carnot efficiency $\eta = 1 - T_C/T_H$, division/multiplication equations).
+  - Standardized naming across the workspace to `exam-agent.ts` and `examAgent` (in `src/mastra/agents/exam-agent.ts`, `src/mastra/index.ts`, and `src/lib/exam-generator.ts`).
+- **Automated Verification**: `npm run check:exam` (8/8 tests passed including calculation question validation), all check suites green (63/63 tests passing).
 
 ## Next action
-Exam Prep simulation (Milestone 6) complete and fully verified with automated test suites (`check:exam` and full check suites). Ready for user feedback and pilot trials on course manuals.
+Ready for user feedback and pilot trials on course manuals with calculation and theoretical balance.

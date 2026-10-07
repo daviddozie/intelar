@@ -13,7 +13,6 @@ import {
 } from "@/lib/workspace-db";
 import { after } from "next/server";
 import { broadcastWorkspaceMessage, createWorkspaceRealtimeBroadcaster } from "@/lib/workspace-realtime";
-import { mastra } from "@/mastra";
 import { randomUUID } from "node:crypto";
 import { v2 as cloudinary } from "cloudinary";
 import { put } from "@vercel/blob";
@@ -259,6 +258,7 @@ CRITICAL ACCURACY GUIDELINES:
 
 Recent workspace chat:
 ${context}`;
+        const { mastra } = await import("@/mastra");
         const answer = await mastra.getAgent("glukAgent").stream(prompt, { maxSteps: 5, modelSettings: { maxOutputTokens: 2048 } });
         let text = "";
         let pendingDelta = "";

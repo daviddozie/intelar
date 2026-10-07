@@ -211,3 +211,35 @@ test("Cascade deletion removes exam and associated attempts", async () => {
     const remainingAttempts = await listExamAttempts(studentEmail, exam.id);
     assert.equal(remainingAttempts.length, 0, "Attempts must be removed when exam is deleted");
 });
+
+test("Generates calculation and formula-solving questions when document contains quantitative formulas", async () => {
+    const exam = await generateExamFromDocument({
+        userEmail: studentEmail,
+        resourceUrls: [testResourceUrl],
+        difficulty: "standard",
+        questionCount: 10,
+        timeLimitMinutes: 20,
+    });
+
+    const calculationQuestions = exam.questions.filter(
+        (q) =>
+            q.question.toLowerCase().includes("calculation") ||
+            q.question.includes("F = m * a") ||
+            q.explanation.toLowerCase().includes("using the formula") ||
+            q.explanation.toLowerCase().includes("using ke") ||
+            q.explanation.toLowerCase().includes("carnot efficiency")
+    );
+
+    assert.ok(
+        calculationQuestions.length > 0,
+        "Exam must include calculation questions when document contains formulas"
+    );
+
+    const firstCalc = calculationQuestions[0];
+    assert.equal(firstCalc.options.length, 4, "Calculation question must have 4 options");
+    assert.ok(firstCalc.correctAnswer >= 0 && firstCalc.correctAnswer <= 3);
+    assert.ok(
+        firstCalc.explanation.includes("=") || firstCalc.explanation.includes("formula"),
+        "Calculation explanation must detail the formula or mathematical working"
+    );
+});
