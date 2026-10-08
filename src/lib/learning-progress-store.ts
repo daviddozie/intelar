@@ -1,7 +1,7 @@
 import type { LessonProgressState } from "./learning-types";
 import { SAMPLE_STATISTICS_COURSE } from "./sample-course";
 
-const STORAGE_PREFIX = "gluk_learning_progress_";
+const STORAGE_PREFIX = "intelar_learning_progress_";
 
 export const DEFAULT_PROGRESS_STATE: LessonProgressState = {
     lastLessonId: null,

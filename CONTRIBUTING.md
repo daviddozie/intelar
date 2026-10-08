@@ -1,4 +1,4 @@
-# Contributing to Gluk
+# Contributing to Intelar
 
 First off — thanks for taking the time to contribute! 🎉
 
@@ -34,8 +34,8 @@ Be kind, be respectful, and assume good intent. Harassment of any kind will not 
 1. **Fork** the repository on GitHub
 2. **Clone** your fork locally:
    ```bash
-   git clone https://github.com/<your-username>/gluk.git
-   cd gluk
+   git clone https://github.com/<your-username>/intelar.git
+   cd intelar
    ```
 3. **Create a branch** for your work:
    ```bash
@@ -51,7 +51,7 @@ Be kind, be respectful, and assume good intent. Harassment of any kind will not 
 
 ### Reporting Bugs
 
-Open a [GitHub Issue](https://github.com/daviddozie/gluk/issues) and include:
+Open a [GitHub Issue](https://github.com/daviddozie/intelar/issues) and include:
 
 - A clear title and description
 - Steps to reproduce the bug
@@ -61,7 +61,7 @@ Open a [GitHub Issue](https://github.com/daviddozie/gluk/issues) and include:
 
 ### Suggesting Features
 
-Open a [GitHub Issue](https://github.com/daviddozie/gluk/issues) with the label `enhancement` and describe:
+Open a [GitHub Issue](https://github.com/daviddozie/intelar/issues) with the label `enhancement` and describe:
 
 - The problem you're trying to solve
 - Your proposed solution
@@ -180,4 +180,4 @@ Here are some good first issues and bigger projects if you're looking for somewh
 
 ## Questions?
 
-Open a [GitHub Discussion](https://github.com/daviddozie/gluk/discussions) or drop a comment on an existing issue. We're happy to help.
+Open a [GitHub Discussion](https://github.com/daviddozie/intelar/discussions) or drop a comment on an existing issue. We're happy to help.

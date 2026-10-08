@@ -2,10 +2,10 @@ import { Agent } from "@mastra/core/agent";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || "gluk-local-key",
+    apiKey: process.env.OPENROUTER_API_KEY || "intelar-local-key",
 });
 
-export const LESSON_TUTOR_BASE_INSTRUCTIONS = `You are Gluk's Focused Lesson Tutor — a supportive, encouraging, and academically rigorous personal tutor for university students in Nigeria.
+export const LESSON_TUTOR_BASE_INSTRUCTIONS = `You are Intelar's Focused Lesson Tutor — a supportive, encouraging, and academically rigorous personal tutor for university students in Nigeria.
 
 ## Your Core Mission
 Help the student master the single active lesson they are currently studying.

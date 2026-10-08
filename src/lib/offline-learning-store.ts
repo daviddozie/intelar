@@ -7,7 +7,7 @@ import type {
 } from "./learning-types";
 import { SAMPLE_STATISTICS_COURSE } from "./sample-course";
 
-const DB_NAME = "gluk_offline_learning_v1";
+const DB_NAME = "intelar_offline_learning_v1";
 const DB_VERSION = 1;
 const STORE_PACKS = "study_packs";
 const STORE_ATTEMPTS = "attempt_queue";
@@ -462,7 +462,7 @@ export async function clearPrivateOfflineData(userEmail: string): Promise<void> 
         // 3. Clear private localStorage progress
         try {
             if (typeof localStorage !== "undefined") {
-                const prefix = `gluk_learning_progress_user_${normEmail}_`;
+                const prefix = `intelar_learning_progress_user_${normEmail}_`;
                 const toRemove: string[] = [];
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);

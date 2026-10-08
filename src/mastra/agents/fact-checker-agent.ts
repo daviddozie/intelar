@@ -9,7 +9,7 @@ import {
 } from "@/lib/temporal";
 
 const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || "gluk-local-key",
+    apiKey: process.env.OPENROUTER_API_KEY || "intelar-local-key",
 });
 
 export function buildFactCheckerInstructions(temporalContext?: TemporalContext): string {

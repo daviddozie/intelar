@@ -34,7 +34,7 @@ export default function ExamPlayer({
     onComplete,
     onExit,
 }: ExamPlayerProps) {
-    const sessionKey = `gluk_exam_active_${exam.id}`;
+    const sessionKey = `intelar_exam_active_${exam.id}`;
 
     const initialSaved = useMemo(() => {
         if (typeof window === "undefined") return null;

@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ArrowDown, Search, FileText, Scale, Newspaper } from "lucide-react";
+import { usePreferences } from "@/context/preferences-context";
 import { Message } from "@/types/chat";
 import MessageBubble from "./message-bubble";
-import GlukLogo from "./svg";
+import IntelarLogo from "./svg";
 import { DocumentViewerFile } from "./document-viewer";
 
 interface ChatWindowProps {
@@ -22,14 +23,15 @@ const SUGGESTIONS = [
 ];
 
 export default function ChatWindow({ messages, isLoading, theme, onPreviewFile }: ChatWindowProps) {
+  const { reducedMotion } = usePreferences();
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const isDark = theme === "dark";
 
   const scrollToBottom = useCallback(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
+    bottomRef.current?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" });
+  }, [reducedMotion]);
 
     const handleScroll = useCallback(() => {
         const el = scrollContainerRef.current;
@@ -40,8 +42,8 @@ export default function ChatWindow({ messages, isLoading, theme, onPreviewFile }
     }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+    bottomRef.current?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" });
+  }, [messages, isLoading, reducedMotion]);
 
   if (messages.length === 0 && !isLoading) {
     return (
@@ -52,7 +54,7 @@ export default function ChatWindow({ messages, isLoading, theme, onPreviewFile }
               ? "bg-white/4 border border-white/8 text-white"
               : "bg-black/4 border border-black/10 text-black"
           }`}>
-            <GlukLogo size={44} />
+            <IntelarLogo size={44} />
           </div>
           <h1 className="text-2xl text-center font-semibold tracking-tight transition-colors duration-300">
             What would you like to research?
@@ -60,7 +62,7 @@ export default function ChatWindow({ messages, isLoading, theme, onPreviewFile }
           <p className={`text-sm text-center max-w-sm transition-colors duration-300 ${
             isDark ? "text-white/40" : "text-black/50"
           }`}>
-            Ask a question, upload a document, or start a deep dive — Gluk searches the web, reads sources, and delivers cited answers.
+            Ask a question, upload a document, or start a deep dive — Intelar searches the web, reads sources, and delivers cited answers.
           </p>
         </div>
 

@@ -2,10 +2,10 @@ import { Agent } from "@mastra/core/agent";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || "gluk-local-key",
+    apiKey: process.env.OPENROUTER_API_KEY || "intelar-local-key",
 });
 
-export const EXAM_AGENT_BASE_INSTRUCTIONS = `You are Gluk's Senior University Examination Board Examiner and Psychometrics Specialist.
+export const EXAM_AGENT_BASE_INSTRUCTIONS = `You are Intelar's Senior University Examination Board Examiner and Psychometrics Specialist.
 
 ## Your Core Mission
 Generate authentic, rigorous, and syllabus-grounded university practice examinations based strictly on verified course lecture notes, textbooks, and lab manuals provided by students.

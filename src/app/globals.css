@@ -132,10 +132,10 @@ html.theme-transition *::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.theme-transition,
-  html.theme-transition *,
-  html.theme-transition *::before,
-  html.theme-transition *::after {
+  html:not([data-motion="full"]).theme-transition,
+  html:not([data-motion="full"]).theme-transition *,
+  html:not([data-motion="full"]).theme-transition *::before,
+  html:not([data-motion="full"]).theme-transition *::after {
     transition-duration: 0ms;
   }
 }
@@ -249,15 +249,15 @@ html.theme-transition *::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  html:not([data-motion="full"]) *,
+  html:not([data-motion="full"]) *::before,
+  html:not([data-motion="full"]) *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .thinking-shine {
+  html:not([data-motion="full"]) .thinking-shine {
     animation: none !important;
     background-position: 50% 50% !important;
   }
@@ -297,4 +297,18 @@ textarea::-webkit-scrollbar {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+html[data-reduced-motion="true"],
+html[data-reduced-motion="true"] *,
+html[data-reduced-motion="true"] *::before,
+html[data-reduced-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+html[data-reduced-motion="true"] [data-ambient],
+html[data-reduced-motion="true"] [data-ambient] * {
+  animation: none !important;
 }

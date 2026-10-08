@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
     const uploaded = await Promise.all(
       files.map(async (file) => {
         const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const pathName = `gluk/${typeof workspaceId === "string" ? `workspaces/${workspaceId}` : userEmail}/${Date.now()}-${sanitizedName}`;
+        const pathName = `intelar/${typeof workspaceId === "string" ? `workspaces/${workspaceId}` : userEmail}/${Date.now()}-${sanitizedName}`;
 
         if (useVercelBlob) {
           const blob = await put(pathName, file, {
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
         const isImage = file.type.startsWith("image/");
 
         const result = await cloudinary.uploader.upload(dataUri, {
-          folder: `gluk/${typeof workspaceId === "string" ? `workspaces/${workspaceId}` : userEmail}`,
+          folder: `intelar/${typeof workspaceId === "string" ? `workspaces/${workspaceId}` : userEmail}`,
           resource_type: isImage ? "image" : "raw",
           public_id: `${Date.now()}-${sanitizedName}`,
         });

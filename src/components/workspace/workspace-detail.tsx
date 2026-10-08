@@ -86,14 +86,14 @@ function WorkspaceDetailContent({
   const [reactionPickerFor, setReactionPickerFor] = useState<string | null>(null);
   const [mentionContext, setMentionContext] = useState<{ start: number; end: number; query: string } | null>(null);
   const [activeMentionIndex, setActiveMentionIndex] = useState(0);
-  const [glukResponding, setGlukResponding] = useState(false);
+  const [intelarResponding, setIntelarResponding] = useState(false);
   const messageRef = useRef(message);
   const [liveMessages, setLiveMessages] = useState<Message[]>([]);
   const messageListRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const composerSelectionRef = useRef({ start: 0, end: 0 });
-  const glukPendingRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const intelarPendingRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const [onlineMembers, setOnlineMembers] = useState<WorkspaceMember[]>([]);
   const [typingMembers, setTypingMembers] = useState<Record<string, { name: string; avatarUrl?: string | null }>>({});
   const [socketReady, setSocketReady] = useState(false);
@@ -158,10 +158,10 @@ function WorkspaceDetailContent({
   useEffect(() => {
     const list = messageListRef.current;
     if (list) list.scrollTop = list.scrollHeight;
-  }, [workspaceMessages.length, glukResponding, typingCount]);
+  }, [workspaceMessages.length, intelarResponding, typingCount]);
   useEffect(() => () => {
-    for (const timeout of glukPendingRef.current.values()) clearTimeout(timeout);
-    glukPendingRef.current.clear();
+    for (const timeout of intelarPendingRef.current.values()) clearTimeout(timeout);
+    intelarPendingRef.current.clear();
   }, []);
   useWorkspaceRealtime({
     status,
@@ -170,13 +170,13 @@ function WorkspaceDetailContent({
     userEmail: session?.user?.email,
     queryClient: qc,
     setWorkspaceMessages: setLiveMessages,
-    setGlukResponding,
+    setIntelarResponding,
     setOnlineMembers,
     setTypingMembers,
     setSocketReady,
     setError,
     ephemeralRef,
-    glukPendingRef,
+    intelarPendingRef,
     typingTimersRef,
     typingClearTimerRef,
   });
@@ -284,7 +284,7 @@ function WorkspaceDetailContent({
   });
   const w = workspaceQ.data;
   const mentionOptions: MentionOption[] = [
-    { kind: "assistant", label: "Gluk", detail: "Ask Gluk in this workspace", value: "@Gluk" },
+    { kind: "assistant", label: "Intelar", detail: "Ask Intelar in this workspace", value: "@Intelar" },
     ...(w?.members ?? []).map((member) => ({ kind: "member" as const, label: member.name, detail: member.email, value: `@${member.name}` })),
     ...(resourcesQ.data ?? []).map((resource) => ({ kind: "resource" as const, label: resource.name, detail: `Workspace resource · ${resource.type}`, value: `@${resource.name}` })),
     ...(w?.role === "owner" ? [{ kind: "invite" as const, label: "Invite a member…", detail: "Invite someone new to this workspace" }] : []),
@@ -380,13 +380,13 @@ function WorkspaceDetailContent({
   async function deliverWorkspaceMessage(pending: Message) {
     const clientMessageId = pending.clientMessageId;
     if (!clientMessageId) return;
-    if (/(^|\s)@gluk\b/i.test(pending.content) && !glukPendingRef.current.has(clientMessageId)) {
+    if (/(^|\s)@intelar\b/i.test(pending.content) && !intelarPendingRef.current.has(clientMessageId)) {
       const timer = setTimeout(() => {
-        glukPendingRef.current.delete(clientMessageId);
-        setGlukResponding(glukPendingRef.current.size > 0);
+        intelarPendingRef.current.delete(clientMessageId);
+        setIntelarResponding(intelarPendingRef.current.size > 0);
       }, 120_000);
-      glukPendingRef.current.set(clientMessageId, timer);
-      setGlukResponding(true);
+      intelarPendingRef.current.set(clientMessageId, timer);
+      setIntelarResponding(true);
     }
     setLiveMessages((current) => mergeMessages(current, [{ ...pending, deliveryStatus: "sending" }]));
     try {
@@ -414,10 +414,10 @@ function WorkspaceDetailContent({
       setError("");
     } catch {
       setLiveMessages((current) => mergeMessages(current, [{ ...pending, deliveryStatus: "failed" }]));
-      const timer = glukPendingRef.current.get(clientMessageId);
+      const timer = intelarPendingRef.current.get(clientMessageId);
       if (timer) clearTimeout(timer);
-      glukPendingRef.current.delete(clientMessageId);
-      setGlukResponding(glukPendingRef.current.size > 0);
+      intelarPendingRef.current.delete(clientMessageId);
+      setIntelarResponding(intelarPendingRef.current.size > 0);
     }
   }
   function sendWorkspaceMessage() {
@@ -450,7 +450,7 @@ function WorkspaceDetailContent({
   function beginReply(target: Message) {
     setReplyTo({
       id: target.id,
-      userName: target.role === "assistant" ? "Gluk" : target.userName,
+      userName: target.role === "assistant" ? "Intelar" : target.userName,
       content: target.content,
     });
     requestAnimationFrame(() => composerRef.current?.focus());
@@ -562,9 +562,9 @@ function WorkspaceDetailContent({
     url.searchParams.set("tab", nextTab);
     window.history.pushState(null, "", url);
   }
-  function handleAskGlukAboutProject(p: WorkspaceProject) {
+  function handleAskIntelarAboutProject(p: WorkspaceProject) {
     changeWorkspaceTab("chat");
-    const prompt = `@Gluk Can you summarize the goals and resources in the ${p.name} project?`;
+    const prompt = `@Intelar Can you summarize the goals and resources in the ${p.name} project?`;
     setMessage(prompt);
     messageRef.current = prompt;
     requestAnimationFrame(() => {
@@ -574,7 +574,7 @@ function WorkspaceDetailContent({
   }
   function handleChatAboutResource(resource: WorkspaceResource) {
     changeWorkspaceTab("chat");
-    const prompt = `@Gluk Can you summarize and review @${resource.name}? `;
+    const prompt = `@Intelar Can you summarize and review @${resource.name}? `;
     setMessage(prompt);
     messageRef.current = prompt;
     requestAnimationFrame(() => {
@@ -648,7 +648,7 @@ function WorkspaceDetailContent({
             workspace={w}
             theme={theme}
             mentionLabels={[...(w.members ?? []).map((member) => member.name), ...(resourcesQ.data ?? []).map((resource) => resource.name)]}
-            glukResponding={glukResponding}
+            intelarResponding={intelarResponding}
             reactionPickerFor={reactionPickerFor}
             setReactionPickerFor={setReactionPickerFor}
             onToggleReaction={toggleReaction}
@@ -690,7 +690,7 @@ function WorkspaceDetailContent({
             onResourceUploaded={() => {
               void qc.invalidateQueries({ queryKey: ["workspace-resources", workspaceId] });
             }}
-            onAskGlukAboutProject={handleAskGlukAboutProject}
+            onAskIntelarAboutProject={handleAskIntelarAboutProject}
             onSharePersonalResource={async (url, projectId) => {
               await sharePersonalResource.mutateAsync({ url, projectId });
             }}

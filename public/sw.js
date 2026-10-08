@@ -1,5 +1,5 @@
-// Gluk Learning MVP — Service Worker for Offline App Shell Caching
-const CACHE_NAME = "gluk-app-shell-v1";
+// Intelar Learning MVP — Service Worker for Offline App Shell Caching
+const CACHE_NAME = "intelar-app-shell-v2";
 const SHELL_ASSETS = [
     "/learn",
     "/manifest.json",
@@ -38,6 +38,15 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
+    // Skip Next.js Turbopack and HMR development requests
+    if (
+        url.pathname.includes("webpack-hmr") ||
+        url.pathname.includes("__nextjs") ||
+        url.pathname.includes("turbopack")
+    ) {
+        return;
+    }
+
     // Skip API routes — let client code manage offline IndexedDB & attempt queue
     if (url.pathname.startsWith("/api/")) {
         return;
@@ -64,7 +73,7 @@ self.addEventListener("fetch", (event) => {
                     const learnFallback = await caches.match("/learn");
                     if (learnFallback) return learnFallback;
                     return new Response(
-                        "<!DOCTYPE html><html><head><title>Gluk Learning (Offline)</title></head><body style='font-family:sans-serif;padding:2rem;background:#09090b;color:#f4f4f5'><h2>You are currently offline</h2><p>Please check your connection or reload to access your downloaded study packs.</p><p><a href='/learn' style='color:#14b8a6'>Go to Learn Dashboard</a></p></body></html>",
+                        "<!DOCTYPE html><html><head><title>Intelar Learning (Offline)</title></head><body style='font-family:sans-serif;padding:2rem;background:#09090b;color:#f4f4f5'><h2>You are currently offline</h2><p>Please check your connection or reload to access your downloaded study packs.</p><p><a href='/learn' style='color:#14b8a6'>Go to Learn Dashboard</a></p></body></html>",
                         { headers: { "Content-Type": "text/html; charset=utf-8" } }
                     );
                 })
@@ -73,26 +82,20 @@ self.addEventListener("fetch", (event) => {
     }
 
     // 2. Next.js static assets & scripts (/_next/static/*)
+    // Network-First with Cache fallback: prevents serving stale JS over fresh SSR HTML while keeping offline functionality
     if (url.pathname.startsWith("/_next/static/") || url.pathname.endsWith(".js") || url.pathname.endsWith(".css")) {
         event.respondWith(
-            caches.match(request).then((cachedResponse) => {
-                if (cachedResponse) {
-                    // Stale-while-revalidate in background
-                    fetch(request).then((networkResponse) => {
-                        if (networkResponse && networkResponse.status === 200) {
-                            caches.open(CACHE_NAME).then((cache) => cache.put(request, networkResponse));
-                        }
-                    }).catch(() => {});
-                    return cachedResponse;
-                }
-                return fetch(request).then((networkResponse) => {
+            fetch(request)
+                .then((networkResponse) => {
                     if (networkResponse && networkResponse.status === 200) {
                         const copy = networkResponse.clone();
                         caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
                     }
                     return networkResponse;
-                });
-            })
+                })
+                .catch(() => {
+                    return caches.match(request);
+                })
         );
         return;
     }

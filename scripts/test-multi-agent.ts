@@ -1,4 +1,4 @@
-import { glukAgent } from "../src/mastra/agents/gluk-agent";
+import { intelarAgent } from "../src/mastra/agents/intelar-agent";
 import { codeReviewerAgent } from "../src/mastra/agents/code-reviewer-agent";
 import { factCheckerAgent } from "../src/mastra/agents/fact-checker-agent";
 
@@ -28,9 +28,9 @@ async function main() {
     console.log("Fact Checker Output Preview:");
     console.log(factCheckResult.text.slice(0, 400) + "...\n");
 
-    console.log("=== 3. Supervisor Delegation Test: Gluk Agent ===");
-    console.log("Prompting Gluk supervisor to review code (should trigger consult_code_reviewer tool)...");
-    const supervisorResult = await glukAgent.generate(
+    console.log("=== 3. Supervisor Delegation Test: Intelar Agent ===");
+    console.log("Prompting Intelar supervisor to review code (should trigger consult_code_reviewer tool)...");
+    const supervisorResult = await intelarAgent.generate(
         `Can you review this code for security issues and fix it?\n\`\`\`typescript\nfunction runCmd(input: string) {\n  require('child_process').exec(input);\n}\n\`\`\``,
         {
             maxSteps: 3,

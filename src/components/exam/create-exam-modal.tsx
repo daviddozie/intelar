@@ -33,8 +33,8 @@ import {
     type ExamQuestionCount,
 } from "@/lib/exam-types";
 
-const STORAGE_DRAFT_KEY = "gluk_exam_modal_draft";
-const STORAGE_ACTIVE_GEN_KEY = "gluk_exam_active_generation";
+const STORAGE_DRAFT_KEY = "intelar_exam_modal_draft";
+const STORAGE_ACTIVE_GEN_KEY = "intelar_exam_active_generation";
 const MAX_GEN_AGE_MS = 240000; // 4 minutes
 
 interface StoredActiveGeneration {
@@ -620,7 +620,7 @@ export default function CreateExamModal({
                                 <div className="min-w-0">
                                     <span className="font-semibold block">Network connection interrupted</span>
                                     <span className="text-[11px] opacity-80">
-                                        Simulation synthesis continues safely. gluk will automatically reconnect once your network returns.
+                                        Simulation synthesis continues safely. Intelar will automatically reconnect once your network returns.
                                     </span>
                                 </div>
                             </div>

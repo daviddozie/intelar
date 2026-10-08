@@ -175,7 +175,7 @@ test("Milestone 5: Practice Question Answers Persist Across Reload with Account 
     mockLocalStorage.clear();
 
     const guestKey = getStorageKey("sample-statistics-101", null);
-    assert.equal(guestKey, "gluk_learning_progress_guest_sample-statistics-101");
+    assert.equal(guestKey, "intelar_learning_progress_guest_sample-statistics-101");
 
     // Guest answers Question 1
     saveLocalLearningProgress(
@@ -197,7 +197,7 @@ test("Milestone 5: Practice Question Answers Persist Across Reload with Account 
     // Authenticated user on same device has completely separate progress
     const authUser = "adaobi@unilag.edu.ng";
     const authKey = getStorageKey("sample-statistics-101", authUser);
-    assert.equal(authKey, "gluk_learning_progress_user_adaobi@unilag.edu.ng_sample-statistics-101");
+    assert.equal(authKey, "intelar_learning_progress_user_adaobi@unilag.edu.ng_sample-statistics-101");
 
     const authLoadedBefore = loadLocalLearningProgress("sample-statistics-101", authUser);
     assert.equal(Object.keys(authLoadedBefore.questionAnswers).length, 0);

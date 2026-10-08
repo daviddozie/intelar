@@ -137,7 +137,7 @@ export function MessageReactionChips({
 }
 
 export function renderMessageContent(content: string, mentionLabels: string[]) {
-  const labels = [...new Set(["Gluk", ...mentionLabels].filter(Boolean))].sort((a, b) => b.length - a.length).map((label) => label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const labels = [...new Set(["Intelar", ...mentionLabels].filter(Boolean))].sort((a, b) => b.length - a.length).map((label) => label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const pattern = new RegExp(`@(?:${labels.join("|")})(?=$|[\\s.,!?;:])|@[\\w][\\w.-]*`, "gi");
   const parts: ReactNode[] = [];
   let offset = 0;

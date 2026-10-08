@@ -13,7 +13,7 @@ function getPinecone() {
 }
 
 function getIndex() {
-    const indexName = process.env.PINECONE_INDEX ?? "gluk-123";
+    const indexName = process.env.PINECONE_INDEX ?? "intelar-123";
     const host = process.env.PINECONE_HOST;
     if (host) {
         return getPinecone().index(indexName, host);

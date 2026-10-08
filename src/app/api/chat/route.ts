@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { mastra } = await import("@/mastra");
-    const agent = mastra.getAgent("glukAgent");
+    const agent = mastra.getAgent("intelarAgent");
 
     const encoder = new TextEncoder();
     const { readable, writable } = new TransformStream();

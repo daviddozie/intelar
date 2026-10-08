@@ -1,4 +1,4 @@
-# Gluk Learning Implementation Plan
+# Intelar Learning Implementation Plan
 
 Read SPEC.md and AGENTS.md before implementation.
 Preserve unrelated changes and existing functionality.

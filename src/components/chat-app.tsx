@@ -44,6 +44,7 @@ export default function ChatApp({
     activeConversationId,
     activeConversation,
     isLoadingInitial,
+    isLoadingConversations,
     conversationsError,
     isRetryingConversations,
     retryConversations,
@@ -101,7 +102,7 @@ export default function ChatApp({
   useEffect(() => {
     if (status === "unauthenticated") {
       const count = parseInt(
-        localStorage.getItem("gluk_guest_prompt_count") || "0",
+        localStorage.getItem("intelar_guest_prompt_count") || "0",
         10,
       );
       if (count >= 3) {
@@ -132,7 +133,7 @@ export default function ChatApp({
     // Check guest limit
     if (!isAuthenticated) {
       const count = parseInt(
-        localStorage.getItem("gluk_guest_prompt_count") || "0",
+        localStorage.getItem("intelar_guest_prompt_count") || "0",
         10,
       );
       if (count >= 3) {
@@ -140,7 +141,7 @@ export default function ChatApp({
         setShowLoginModal(true);
         return;
       }
-      localStorage.setItem("gluk_guest_prompt_count", String(count + 1));
+      localStorage.setItem("intelar_guest_prompt_count", String(count + 1));
     }
 
     // Keep the selected resource attached to this first prompt, then clear the
@@ -153,7 +154,7 @@ export default function ChatApp({
       setActiveConversationId(convId);
     }
 
-    // Smoothly update address bar to /c/[convId] if starting from '/' - ONLY for authenticated users
+    // Smoothly update address bar to /c/[convId] if starting from '/chat' - ONLY for authenticated users
     if (
       isAuthenticated &&
       typeof window !== "undefined" &&
@@ -411,7 +412,7 @@ export default function ChatApp({
       abortControllerRef.current = null;
       if (!isAuthenticated) {
         const count = parseInt(
-          localStorage.getItem("gluk_guest_prompt_count") || "0",
+          localStorage.getItem("intelar_guest_prompt_count") || "0",
           10,
         );
         if (count >= 3) {
@@ -488,7 +489,7 @@ export default function ChatApp({
           isOpen={sidebarOpen}
           onToggle={() => setSidebarOpen((v) => !v)}
           theme={theme}
-          isLoading={isLoadingInitial}
+          isLoadingConversations={isLoadingConversations}
           loadError={conversationsError}
           isRetrying={isRetryingConversations}
           onRetry={retryConversations}
@@ -600,9 +601,9 @@ export default function ChatApp({
 
         {/* Chat message area — uses scoped skeleton only if an uncached thread is being fetched */}
         {activeView === "exam-prep" ? (
-          <ExamHome theme={theme} onOpenChat={() => { setActiveView("chat"); router.push("/"); }} />
+          <ExamHome theme={theme} onOpenChat={() => { setActiveView("chat"); router.push("/chat"); }} />
         ) : activeView === "learn" ? (
-          <LearningHome theme={theme} onOpenChat={() => { setActiveView("chat"); router.push("/"); }} />
+          <LearningHome theme={theme} onOpenChat={() => { setActiveView("chat"); router.push("/chat"); }} />
         ) : activeView === "resources" ? (
           <ResourcesLibrary
             theme={theme}
