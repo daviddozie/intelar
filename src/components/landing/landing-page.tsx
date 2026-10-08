@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowDown, ArrowUpRight, ArrowRight, BookOpen, Check, FileText, Globe2, GraduationCap, Layers3, Pause, Play, Search, UsersRound, Sun, Moon, Download, ClipboardCheck, FolderOpen } from "lucide-react";
 import IntelarLogo from "@/components/svg";
 import { useChat } from "@/context/chat-context";
@@ -48,6 +48,8 @@ export default function LandingPage() {
   const { theme, toggleTheme } = useChat();
   const [activeExample, setActiveExample] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const example = examples[activeExample];
 
   return (
@@ -62,8 +64,14 @@ export default function LandingPage() {
           <a href="#questions">Questions</a>
         </nav>
         <div className={styles.headerActions}>
-          <button onClick={toggleTheme} className={styles.themeToggle} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}>
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          <button
+            suppressHydrationWarning
+            onClick={toggleTheme}
+            className={styles.themeToggle}
+            aria-label={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Switch theme"}
+            title={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Switch theme"}
+          >
+            {mounted && theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <Link href="/login?callbackUrl=%2Fchat" className={styles.loginLink}>Log in</Link>
           <Link href="/chat" className={styles.openApp}>Open Intelar <ArrowUpRight size={15} /></Link>

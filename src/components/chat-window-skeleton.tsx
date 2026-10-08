@@ -8,8 +8,8 @@ interface ChatWindowSkeletonProps {
 
 export default function ChatWindowSkeleton({ theme }: ChatWindowSkeletonProps) {
     const isDark = theme === "dark";
-    const shimHigh = isDark ? "bg-white/8" : "bg-black/8";
-    const shimLow = isDark ? "bg-white/6" : "bg-black/5";
+    const shimHigh = isDark ? "bg-white/12" : "bg-black/10";
+    const shimLow = isDark ? "bg-white/7" : "bg-black/6";
 
     return (
         <div className="flex-1 overflow-hidden">

@@ -13,6 +13,10 @@ export const authOptions: NextAuthOptions = {
             clientSecret: process.env.GITHUB_CLIENT_SECRET!,
         }),
     ],
+    secret:
+        process.env.NEXTAUTH_SECRET ||
+        process.env.AUTH_SECRET ||
+        "intelar-default-session-secret-change-in-production",
     session: {
         strategy: "jwt",
     },
