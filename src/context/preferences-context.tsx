@@ -88,7 +88,6 @@ export function PreferencesProvider({
     status === "authenticated" ? (session?.user?.email ?? null) : null;
   return (
     <AccountPreferences
-      key={email ?? "guest"}
       email={email}
       authLoading={status === "loading"}
     >

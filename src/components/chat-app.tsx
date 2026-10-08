@@ -81,6 +81,8 @@ export default function ChatApp({
   const [activeView, setActiveView] = useState<
     "chat" | "resources" | "workspaces" | "workspace" | "learn" | "exam-prep"
   >(initialView);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(
     () => setActiveView(initialView),
@@ -569,12 +571,13 @@ export default function ChatApp({
             )}
 
             <button
+              suppressHydrationWarning
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-black/6 dark:hover:bg-white/6 cursor-pointer transition-all duration-300 shrink-0"
-              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+              title={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Switch theme"}
+              aria-label={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Switch theme"}
             >
-              {theme === "dark" ? (
+              {mounted && theme === "dark" ? (
                 <Sun className="w-4.5 h-4.5" />
               ) : (
                 <Moon className="w-4.5 h-4.5" />
@@ -619,7 +622,7 @@ export default function ChatApp({
               createNewConversation(reference);
             }}
           />
-        ) : activeView === "workspaces" ? (
+        ) : activeView === "workspaces" || (activeView === "workspace" && !initialWorkspaceId) ? (
           <WorkspacesHome />
         ) : activeView === "workspace" && initialWorkspaceId ? (
           <WorkspaceDetail
@@ -628,7 +631,7 @@ export default function ChatApp({
             theme={theme}
             onPreviewFile={setPreviewFile}
           />
-        ) : isLoadingInitial || isLoadingThread ? (
+        ) : isLoadingThread || (Boolean(activeConversationId) && !activeConversation && isLoadingInitial) ? (
           <ChatWindowSkeleton theme={theme} />
         ) : (
           <ChatWindow
@@ -640,28 +643,17 @@ export default function ChatApp({
         )}
 
         {/* Chat input — always interactive */}
-        {activeView === "chat" &&
-          (isLoadingInitial ? (
-            <div
-              className="px-4 pb-6 pt-2"
-              role="status"
-              aria-label="Loading chat composer"
-            >
-              <div className="mx-auto max-w-3xl">
-                <Skeleton className="h-13 w-full rounded-2xl" />
-              </div>
-            </div>
-          ) : (
-            <ChatInput
-              onSend={handleSend}
-              onAbort={() => abortControllerRef.current?.abort()}
-              isStreaming={isStreaming}
-              theme={theme}
-              referenceResource={documentReference}
-              onRemoveReference={() => setDocumentReference(null)}
-              onSelectResource={setDocumentReference}
-            />
-          ))}
+        {activeView === "chat" && (
+          <ChatInput
+            onSend={handleSend}
+            onAbort={() => abortControllerRef.current?.abort()}
+            isStreaming={isStreaming}
+            theme={theme}
+            referenceResource={documentReference}
+            onRemoveReference={() => setDocumentReference(null)}
+            onSelectResource={setDocumentReference}
+          />
+        )}
         {previewFile && (
           <div className="absolute inset-0 z-40 flex min-h-0">
             <DocumentViewer
