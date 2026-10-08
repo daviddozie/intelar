@@ -1,5 +1,6 @@
 "use client";
 
+import { usePreferences } from "@/context/preferences-context";
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -27,6 +28,7 @@ export default function LessonTutorDrawer({
     courseId,
     theme = "dark",
 }: LessonTutorDrawerProps) {
+    const { reducedMotion } = usePreferences();
     const isDark = theme === "dark";
     const [messages, setMessages] = useState<TutorMessage[]>([]);
     const [input, setInput] = useState("");
@@ -45,8 +47,8 @@ export default function LessonTutorDrawer({
     }, [lesson.id, lesson.title]);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages, isLoading]);
+        messagesEndRef.current?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth" });
+    }, [messages, isLoading, reducedMotion]);
 
     if (!isOpen) return null;
 

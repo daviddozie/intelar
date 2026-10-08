@@ -26,7 +26,7 @@ type WorkspaceChatPanelProps = {
   workspace: Workspace;
   theme: WorkspaceTheme;
   mentionLabels: string[];
-  glukResponding: boolean;
+  intelarResponding: boolean;
   reactionPickerFor: string | null;
   setReactionPickerFor: Dispatch<SetStateAction<string | null>>;
   onToggleReaction: (message: Message, emoji: string) => void | Promise<void>;
@@ -138,7 +138,7 @@ function WorkspaceFilePreviewChip({
 }
 
 export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
-  const { messageListRef, composerRef, fileInputRef, composerSelectionRef, typingMembers, socketReady, messagesLoading, workspaceMessages, session, workspace: w, theme, mentionLabels, glukResponding, reactionPickerFor, setReactionPickerFor, onToggleReaction: toggleReaction, onReply: beginReply, onRetry: deliverWorkspaceMessage, replyTo, setReplyTo, submitMessage, handleFilesSelected, attachedFiles, setAttachedFiles, mentionContext, filteredMentionOptions, activeMentionIndex, selectMention, message, handleMessageChange, onComposerKeyDown, emojiPickerOpen, setEmojiPickerOpen, insertComposerText, openMentionPicker, onPreview } = props;
+  const { messageListRef, composerRef, fileInputRef, composerSelectionRef, typingMembers, socketReady, messagesLoading, workspaceMessages, session, workspace: w, theme, mentionLabels, intelarResponding, reactionPickerFor, setReactionPickerFor, onToggleReaction: toggleReaction, onReply: beginReply, onRetry: deliverWorkspaceMessage, replyTo, setReplyTo, submitMessage, handleFilesSelected, attachedFiles, setAttachedFiles, mentionContext, filteredMentionOptions, activeMentionIndex, selectMention, message, handleMessageChange, onComposerKeyDown, emojiPickerOpen, setEmojiPickerOpen, insertComposerText, openMentionPicker, onPreview } = props;
   const isDark = theme === "dark";
   return (
           <section className="flex min-h-0 flex-1 flex-col">
@@ -156,7 +156,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                 workspaceMessages.map((m, index) => {
                   const isOwn = m.role === "user" && m.userEmail === session.user?.email?.toLowerCase();
                   const member = w.members.find((item) => item.email === m.userEmail);
-                  const senderName = m.role === "assistant" ? "Gluk" : m.userName;
+                  const senderName = m.role === "assistant" ? "Intelar" : m.userName;
                   const avatarUrl = member?.avatarUrl ?? (isOwn ? session.user?.image : null);
                   const sentAt = new Date(m.createdAt);
                   const isMentionForMe = messageMentionsUser(m.content, session.user?.name, session.user?.email);
@@ -193,11 +193,11 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                               );
                             })}
                             <button type="button" onClick={() => setReactionPickerFor(reactionPickerFor === m.id ? null : m.id)} aria-label="Choose reaction" title="Choose reaction" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><SmilePlus className="h-4 w-4" /></button>
-                            <button type="button" onClick={() => beginReply(m)} aria-label="Reply to Gluk" title="Reply" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><MessageSquareReply className="h-4 w-4" /></button>
+                            <button type="button" onClick={() => beginReply(m)} aria-label="Reply to Intelar" title="Reply" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><MessageSquareReply className="h-4 w-4" /></button>
                           </div>}
                           {reactionPickerFor === m.id && <div className="absolute right-3 top-11 z-30"><WorkspaceEmojiPicker onClose={() => setReactionPickerFor(null)} onSelect={(emoji) => void toggleReaction(m, emoji)} /></div>}
                           <div className="mb-1 flex items-center gap-2 px-1 text-[11px] text-muted-foreground">
-                            <span className="font-medium text-foreground">Gluk</span>
+                            <span className="font-medium text-foreground">Intelar</span>
                             <time dateTime={sentAt.toISOString()} title={sentAt.toLocaleString()}>{sentAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
                           </div>
                           {m.replyTo && <div className="mb-2 max-w-md rounded-md border-l-2 border-sky-500/70 bg-muted/40 px-2.5 py-1.5 text-xs"><span className="font-medium text-foreground">Replying to {m.replyTo.userName}</span><p className="mt-0.5 line-clamp-2 text-muted-foreground">{m.replyTo.content}</p></div>}
@@ -277,13 +277,13 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                     </h2>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Messages are visible to everyone in this workspace.
-                      Mention <code>@Gluk</code> to ask the assistant.
+                      Mention <code>@Intelar</code> to ask the assistant.
                     </p>
                   </div>
                 </div>
               )}
-              {glukResponding && (
-                <MessageBubble message={{ id: "gluk-pending-response", role: "assistant", content: "", createdAt: new Date(0), isStreaming: true }} theme={theme} />
+              {intelarResponding && (
+                <MessageBubble message={{ id: "intelar-pending-response", role: "assistant", content: "", createdAt: new Date(0), isStreaming: true }} theme={theme} />
               )}
               <WorkspaceTypingIndicator typingMembers={typingMembers} members={w.members} isDark={isDark} />
             </div>
@@ -339,7 +339,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                   onKeyDown={onComposerKeyDown}
                   rows={1}
                   maxLength={10000}
-                  placeholder="Message your workspace… Use @Gluk to ask the assistant"
+                  placeholder="Message your workspace… Use @Intelar to ask the assistant"
                   className="max-h-28 min-h-10 w-full resize-none bg-transparent px-2 py-2 text-sm leading-5 outline-none placeholder:text-muted-foreground"
                 />
               </div>

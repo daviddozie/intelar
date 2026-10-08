@@ -12,11 +12,11 @@ import { askFactCheckerTool } from "../tools/ask-fact-checker-tool";
 import { askCodeReviewerTool } from "../tools/ask-code-reviewer-tool";
 import { factCheckerAgent } from "./fact-checker-agent";
 import { codeReviewerAgent } from "./code-reviewer-agent";
-import { buildGlukInstructions } from "./gluk-instructions";
+import { buildIntelarInstructions } from "./intelar-instructions";
 import { getSystemTemporalContext } from "@/lib/temporal";
 
 const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || "gluk-local-key",
+    apiKey: process.env.OPENROUTER_API_KEY || "intelar-local-key",
 });
 
 const tursoUrl = process.env.TURSO_DATABASE_URL?.trim();
@@ -24,7 +24,7 @@ const tursoUrl = process.env.TURSO_DATABASE_URL?.trim();
 const memory = new Memory({
     storage: tursoUrl
         ? new LibSQLStore({
-            id: "gluk-memory",
+            id: "intelar-memory",
             url: tursoUrl,
             authToken: process.env.TURSO_AUTH_TOKEN,
         })
@@ -34,9 +34,9 @@ const memory = new Memory({
     },
 });
 
-export const glukAgent = new Agent({
-    id: "gluk_agent",
-    name: "Gluk",
+export const intelarAgent = new Agent({
+    id: "intelar_agent",
+    name: "Intelar",
     instructions: ({ requestContext }) => {
         let tz: string | undefined;
         try {
@@ -46,7 +46,7 @@ export const glukAgent = new Agent({
         } catch {
             // fallback to default
         }
-        return buildGlukInstructions(getSystemTemporalContext(tz));
+        return buildIntelarInstructions(getSystemTemporalContext(tz));
     },
     model: openrouter(process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat"),
     tools: {

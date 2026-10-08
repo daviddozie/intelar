@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { usePreferences } from "@/context/preferences-context";
+import { useHelp } from "@/context/help-context";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import LogoutModal from "./logout-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Conversation } from "@/types/chat";
-import GlukLogo from "./svg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,7 +61,7 @@ interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   theme: "light" | "dark";
-  isLoading?: boolean;
+  isLoadingConversations?: boolean;
   loadError?: string | null;
   isRetrying?: boolean;
   onRetry?: () => void;
@@ -84,13 +86,16 @@ export default function Sidebar({
   isOpen,
   onToggle,
   theme,
-  isLoading = false,
+  isLoadingConversations = false,
   loadError = null,
   isRetrying = false,
   onRetry,
   isAuthLoading = false,
 }: SidebarProps) {
   const { data: session } = useSession();
+  const { openSettings, settingsOpen } = usePreferences();
+  const { openHelp } = useHelp();
+  const accountTrigger = useRef<HTMLButtonElement>(null);
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<{
     id: string;
@@ -120,18 +125,17 @@ export default function Sidebar({
       {/* Header */}
       {isOpen ? (
         <div
-          className={`flex items-center justify-between px-3 py-3 border-b transition-colors duration-300 ${
+          className={`flex items-center justify-between pl-6 pr-3 py-3 border-b transition-colors duration-300 ${
             isDark ? "border-white/6" : "border-black/10"
           }`}
         >
-          <div className="flex items-center gap-2">
-            <div
-              className={`w-7 h-7 flex items-center justify-center ${isDark ? "text-white" : "text-black"}`}
-            >
-              <GlukLogo size={28} />
-            </div>
-            <span className="font-semibold text-sm tracking-wide">Gluk</span>
-          </div>
+          <Image
+            src="/intelar-logo.svg"
+            alt="Intelar"
+            width={28}
+            height={22}
+            className={`shrink-0 ${isDark ? "" : "invert"}`}
+          />
           <div className="flex items-center gap-1">
             <button
               onClick={onNew}
@@ -186,7 +190,13 @@ export default function Sidebar({
             title="Open sidebar"
             aria-label="Open sidebar"
           >
-            <GlukLogo size={34} />
+            <Image
+              src="/intelar-logo.svg"
+              alt="Intelar"
+              width={40}
+              height={34}
+              className={isDark ? "" : "invert"}
+            />
           </button>
           {session?.user && (
             <button
@@ -371,7 +381,7 @@ export default function Sidebar({
               )}
             </div>
           )}
-          {isLoading ? (
+          {isLoadingConversations ? (
             <div
               className="space-y-4 px-3 py-3"
               role="status"
@@ -501,7 +511,7 @@ export default function Sidebar({
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button
+              <button ref={accountTrigger}
                 className={`w-full flex items-center ${isOpen ? "gap-2 px-2" : "justify-center px-0"} py-2 rounded-lg cursor-pointer transition-colors group ${
                   isDark ? "hover:bg-white/6" : "hover:bg-black/6"
                 }`}
@@ -541,6 +551,7 @@ export default function Sidebar({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
+              onCloseAutoFocus={(event) => { if (settingsOpen) event.preventDefault(); }}
               side="top"
               align={isOpen ? "start" : "center"}
               className={`w-60 mb-1 transition-colors duration-300 ${
@@ -584,6 +595,7 @@ export default function Sidebar({
               />
 
               <DropdownMenuItem
+                onSelect={() => openSettings(accountTrigger.current ?? undefined)}
                 className={`gap-2 cursor-pointer ${
                   isDark
                     ? "text-white/70 hover:text-white focus:text-white focus:bg-white/6"
@@ -595,6 +607,7 @@ export default function Sidebar({
               </DropdownMenuItem>
 
               <DropdownMenuItem
+                onSelect={() => openHelp()}
                 className={`gap-2 cursor-pointer ${
                   isDark
                     ? "text-white/70 hover:text-white focus:text-white focus:bg-white/6"
@@ -625,6 +638,7 @@ export default function Sidebar({
           </DropdownMenu>
         )}
       </div>
+      {!session?.user && !isAuthLoading && <button aria-label="Open settings" onClick={(event) => openSettings(event.currentTarget)} className={`mx-3 mb-3 flex cursor-pointer items-center justify-center gap-2 rounded-full border px-3 py-2 text-xs ${isDark ? "border-white/10 text-white/70 hover:bg-white/5" : "border-black/10 text-black/70 hover:bg-black/5"}`}><Settings size={14} />{isOpen && "Settings"}</button>}
       <Dialog
         open={deleteTarget !== null}
         onOpenChange={(open) => !open && setDeleteTarget(null)}

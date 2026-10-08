@@ -331,7 +331,7 @@ test("application shell service worker and web manifest exist with correct offli
 
     const swContent = readFileSync(swPath, "utf-8");
     assert.ok(swContent.includes("/learn"), "Service worker must precache or cache /learn");
-    assert.ok(swContent.includes("gluk-app-shell"), "Service worker must manage gluk-app-shell cache");
+    assert.ok(swContent.includes("intelar-app-shell"), "Service worker must manage intelar-app-shell cache");
     assert.ok(swContent.includes("navigate"), "Service worker must handle navigate requests for offline fallback");
 
     const manifestContent = JSON.parse(readFileSync(manifestPath, "utf-8"));

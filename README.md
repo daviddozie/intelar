@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>🔍 Gluk</h1>
+  <h1>🔍 Intelar</h1>
   <p><strong>A full-stack AI research agent — chat, search, read documents, and get cited answers.</strong></p>
   <p>
     <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js" />
@@ -11,9 +11,13 @@
 
 ---
 
-## What is Gluk?
+## What is Intelar?
 
-Gluk is an AI-powered research assistant you can chat with. Unlike a standard chatbot, Gluk can:
+The public landing page at `/` introduces research, learning, and collaboration. Open `/chat` for a new conversation; saved conversations remain at `/c/[id]`. Sign-in returns to `/chat` by default, and sign-out returns to the landing page.
+
+The landing-page header includes a light/dark switch that shares the app's saved theme preference. Product previews are illustrative; visitors can pause their animation, and reduced-motion preferences disable it.
+
+Intelar is an AI-powered research assistant you can chat with. Unlike a standard chatbot, Intelar can:
 
 - 🔎 **Search the web** in real time and cite its sources
 - 📄 **Read your files** — upload a PDF, CSV, Word doc, or text file and ask questions about it
@@ -28,7 +32,7 @@ Gluk is an AI-powered research assistant you can chat with. Unlike a standard ch
 | Feature | Description |
 |---|---|
 | **Multi-step research pipeline** | Plan → Search → Deep-read → Rerank → Synthesise |
-| **RAG (document Q&A)** | Upload files; Gluk stores them in Pinecone and answers from them |
+| **RAG (document Q&A)** | Upload files; Intelar stores them in Pinecone and answers from them |
 | **Live web search** | Tavily API with advanced depth, 8 results, published dates |
 | **Source ranking** | TF-IDF relevance + domain credibility scoring |
 | **Hybrid vector search** | 70% vector similarity + 30% keyword overlap, MMR deduplication |
@@ -70,8 +74,8 @@ Gluk is an AI-powered research assistant you can chat with. Unlike a standard ch
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/daviddozie/gluk.git
-cd gluk
+git clone https://github.com/daviddozie/intelar.git
+cd intelar
 ```
 
 ### 2. Install dependencies
@@ -93,7 +97,7 @@ cp .env.example .env.local
 | `OPENROUTER_API_KEY` | [openrouter.ai/keys](https://openrouter.ai/keys) |
 | `TAVILY_API_KEY` | [tavily.com](https://tavily.com) |
 | `PINECONE_API_KEY` | [app.pinecone.io](https://app.pinecone.io) |
-| `PINECONE_INDEX` | Your index name in Pinecone (e.g. `gluk`) |
+| `PINECONE_INDEX` | Your index name in Pinecone (e.g. `intelar`) |
 | `PINECONE_HOST` | Your index host URL from the Pinecone dashboard |
 | `TURSO_DATABASE_URL` | `libsql://your-db.turso.io` |
 | `TURSO_AUTH_TOKEN` | From your Turso dashboard |
@@ -122,7 +126,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 Workspace chat uses Supabase Realtime and does not need a separate socket process or Redis. Set the Supabase variables in `.env.local`. Get the URL and publishable/secret API keys from the Supabase project dashboard. Generate an ES256 signing key with `supabase gen signing-key --algorithm ES256`, register the matching public JWK in Supabase Auth → JWT Signing Keys, activate it, then configure the key `kid` and private JWK on the server. Keep the secret API key and private JWK out of browser variables and source control. Apply `supabase/migrations/20260929000000_workspace_realtime.sql` in the Supabase SQL Editor; it authorizes private workspace message, ephemeral, and per-user read-cursor channels using short-lived member-scoped JWT claims. The app continues to store chat messages and unread read-cursors in Turso. Run `npm run dev:all` to start Next.js and Mastra Studio.
 
-Workspace Realtime carries saved-message broadcasts, presence, and typing only. The free Supabase tier has finite connection and message quotas; Realtime broadcast fan-out contributes usage per recipient, so monitor Realtime usage as workspaces grow. `@Gluk` replies are generated after the HTTP send response within the Next.js function lifetime; this is not a durable job queue.
+Workspace Realtime carries saved-message broadcasts, presence, and typing only. The free Supabase tier has finite connection and message quotas; Realtime broadcast fan-out contributes usage per recipient, so monitor Realtime usage as workspaces grow. `@Intelar` replies are generated after the HTTP send response within the Next.js function lifetime; this is not a durable job queue.
 
 ### Troubleshooting database connections
 
@@ -167,7 +171,7 @@ src/
 └── mastra/
     ├── index.ts                  # Mastra config — agent + workflow registration
     ├── agents/
-    │   └── gluk-agent.ts         # Main AI agent (tools, memory, system prompt)
+    │   └── intelar-agent.ts         # Main AI agent (tools, memory, system prompt)
     ├── tools/
     │   ├── web-search-tool.tsx   # Tavily web search
     │   ├── web-fetch-tool.ts     # Full-page HTML extractor
@@ -187,7 +191,7 @@ src/
 
 ## �� How the Research Pipeline Works
 
-When Gluk detects a research-type question, it runs a 5-step Mastra workflow instead of a single agent call:
+When Intelar detects a research-type question, it runs a 5-step Mastra workflow instead of a single agent call:
 
 ```
 1. Plan        → Break the question into 2–3 focused sub-queries
@@ -197,7 +201,7 @@ When Gluk detects a research-type question, it runs a 5-step Mastra workflow ins
 5. Synthesise  → Write a structured answer with inline [Title](URL) citations
 ```
 
-For document questions (e.g. *"list the orders in the file"*), the research workflow is skipped. Gluk answers directly from Pinecone RAG — one LLM call, no web search.
+For document questions (e.g. *"list the orders in the file"*), the research workflow is skipped. Intelar answers directly from Pinecone RAG — one LLM call, no web search.
 
 ---
 
@@ -256,7 +260,7 @@ accepted by signing in with the invited email. Configure `RESEND_API_KEY` and
 `RESEND_FROM_EMAIL` to send invitations. If either setting is missing, the
 workspace page displays a copyable invitation link instead.
 
-Workspace chat is text-only. Mention `@Gluk` in a message to get an assistant
+Workspace chat is text-only. Mention `@Intelar` in a message to get an assistant
 reply in the shared conversation. Projects and workspace resource records are
 scoped to their workspace. Resource files are served through a member-checked
 endpoint; the underlying files still use the app's existing storage providers.
@@ -264,3 +268,7 @@ Workspace chat uses private Supabase Realtime channels for live delivery,
 presence, typing indicators, and in-app message notices. Turso remains the
 durable source for messages and per-member unread cursors; there is no periodic
 message polling. Video calls and browser push notifications are not included.
+
+### Personal settings
+
+Open Settings from the sidebar account menu, or the guest Settings button. Appearance and motion preferences apply across the app and landing page. Signed-in preferences sync through `/api/settings`; guest preferences stay in the browser. Settings uses an additive `user_settings` table in the existing Turso database and requires no new environment variables. Account details are read-only. Data & storage shows browser study-pack and pending-attempt counts; manage downloads in Learn.

@@ -7,7 +7,7 @@ import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
-import GlukLogo from "./svg";
+import IntelarLogo from "./svg";
 import { FileIcon, getFileCategory } from "@public/svg/icon";
 
 interface MessageBubbleProps {
@@ -58,11 +58,6 @@ function CopyButton({ text, isDark }: { text: string; isDark: boolean }) {
     </button>
   );
 }
-
-// ─── Karaoke Markdown ─────────────────────────────────────────────────────────
-// Renders full markdown — tables, code blocks, headings — completely intact.
-// Words in text nodes are individually wrapped in <span>s for highlight.
-// The layout NEVER changes; we just add colour on top.
 
 function KaraokeMarkdown({
   content,
@@ -699,7 +694,7 @@ export default function MessageBubble({ message, theme, onPreviewFile }: Message
             : "bg-black/6 border border-black/10 text-black"
           }`}
       >
-        {isUser ? getInitials() : <GlukLogo size={16} />}
+        {isUser ? getInitials() : <IntelarLogo size={16} />}
       </div>
 
       <div className={`flex flex-col gap-1 max-w-[88%] sm:max-w-[85%] ${isUser ? "items-end" : "items-start"}`}>

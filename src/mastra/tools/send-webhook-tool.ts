@@ -87,7 +87,7 @@ export const sendWebhookTool = createTool({
             const timeout = setTimeout(() => controller.abort(), 10000);
 
             const payload = {
-                event: "gluk.research_digest",
+                event: "intelar.research_digest",
                 timestamp: deliveredAt,
                 title,
                 message,
@@ -98,7 +98,7 @@ export const sendWebhookTool = createTool({
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "User-Agent": "GlukAgent/1.0 (+https://gluk.ai)",
+                    "User-Agent": "IntelarAgent/1.0 (+https://intelar.vercel.app)",
                 },
                 body: JSON.stringify(payload),
                 signal: controller.signal,

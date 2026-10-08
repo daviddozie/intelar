@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Plus, X, Mic, LibraryBig, Paperclip, FolderOpen } from "lucide-react";
+import { Plus, X, Mic, Paperclip, FolderOpen } from "lucide-react";
 import { FileIcon, getFileCategory } from "@public/svg/icon";
 import FilePreviewModal from "./file-preview-modal";
 import { ResourceReference } from "@/types/resource";
@@ -509,7 +509,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyDown={handleKeyDown}
-                                    placeholder="Message Gluk..."
+                                    placeholder="Message Intelar..."
                                     rows={1}
                                     className={`flex-1 bg-transparent text-sm resize-none outline-none leading-6 max-h-[160px] overflow-y-auto transition-colors duration-300 ${
                                         isDark ? "text-white placeholder-white/30" : "text-black placeholder-black/30"

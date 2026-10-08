@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "gluk",
+      "name": "intelar",
       "dependencies": {
         "@huggingface/inference": "^4.13.15",
         "@mastra/core": "^1.10.0",

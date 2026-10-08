@@ -1,52 +1,33 @@
 /**
- * Core runtime system clock source for Gluk.
+ * Core runtime system clock source for Intelar.
  * Provides timezone-aware temporal context derived strictly from the server/system clock.
  */
 
 export const DEFAULT_TIMEZONE = process.env.APP_TIMEZONE || "Africa/Lagos";
 
 export interface TemporalContext {
-    /** JavaScript Date instance representing the exact current moment */
     now: Date;
-    /** ISO 8601 timestamp string in target timezone offset */
     iso: string;
-    /** Full readable date string: e.g. "Friday, September 18, 2026" */
     dateString: string;
-    /** Standard date string: e.g. "September 18, 2026" */
     formattedDate: string;
-    /** YYYY-MM-DD formatted string: e.g. "2026-09-18" */
     calendarDate: string;
-    /** Time string with AM/PM: e.g. "10:25 AM" */
     formattedTime: string;
-    /** Full date and time with timezone abbreviation: e.g. "September 18, 2026, 10:25 AM WAT" */
     formattedDateTime: string;
-    /** Full four-digit calendar year: e.g. 2026 */
     year: number;
-    /** Month number (1-12): e.g. 9 */
     month: number;
-    /** Full English month name: e.g. "September" */
     monthName: string;
-    /** Day of month (1-31): e.g. 18 */
     day: number;
-    /** Full day of week name: e.g. "Friday" */
     dayOfWeek: string;
-    /** IANA timezone identifier: e.g. "Africa/Lagos" */
     timezone: string;
-    /** UTC offset string: e.g. "+01:00" */
     utcOffset: string;
 }
 
-/**
- * Returns formatted temporal context for the given timezone (defaults to Africa/Lagos)
- * derived from the runtime system clock.
- */
 export function getSystemTemporalContext(
     timeZone: string = DEFAULT_TIMEZONE,
     referenceDate: Date = new Date()
 ): TemporalContext {
     const tz = isValidTimezone(timeZone) ? timeZone : DEFAULT_TIMEZONE;
 
-    // Use Intl.DateTimeFormat to compute timezone-accurate calendar fields
     const dtfFull = new Intl.DateTimeFormat("en-US", {
         timeZone: tz,
         weekday: "long",

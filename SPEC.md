@@ -1,4 +1,4 @@
-# Gluk Learning MVP Specification
+# Intelar Learning MVP Specification
 
 ## Purpose
 Help Nigerian university students turn existing resources into
@@ -13,12 +13,12 @@ studying during internet interruptions.
 - Scope: one-week proof of concept.
 
 ## Existing foundation
-Preserve Gluk's research chat, resources, authentication, and
+Preserve Intelar's research chat, resources, authentication, and
 workspaces. Extend the existing Next.js, Mastra, and LibSQL stack.
 
 ## Learning materials
 Learners select existing resources or upload authorized materials.
-Gluk prepares learning content from those sources.
+Intelar prepares learning content from those sources.
 
 The demonstration course uses selected OpenIntro Statistics material
 with attribution and applicable licensing notices.

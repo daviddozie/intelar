@@ -77,7 +77,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ workspa
       for (const file of files) {
         const id = randomUUID();
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const pathname = `gluk/workspaces/${workspaceId}/messages/${id}-${safeName}`;
+        const pathname = `intelar/workspaces/${workspaceId}/messages/${id}-${safeName}`;
         let storageUrl: string;
         if (useVercelBlob) {
           const blob = await put(pathname, file, { access: "public", contentType: file.type || "application/octet-stream", token: process.env.BLOB_READ_WRITE_TOKEN });
@@ -85,7 +85,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ workspa
         } else {
           const bytes = Buffer.from(await file.arrayBuffer());
           const dataUri = `data:${file.type || "application/octet-stream"};base64,${bytes.toString("base64")}`;
-          const result = await cloudinary.uploader.upload(dataUri, { folder: `gluk/workspaces/${workspaceId}/messages`, resource_type: file.type.startsWith("image/") ? "image" : "raw", public_id: id });
+          const result = await cloudinary.uploader.upload(dataUri, { folder: `intelar/workspaces/${workspaceId}/messages`, resource_type: file.type.startsWith("image/") ? "image" : "raw", public_id: id });
           storageUrl = result.secure_url;
         }
         storedAttachments.push({ id, name: file.name.slice(0, 255), type: file.type || "application/octet-stream", size: file.size, storageUrl });
@@ -136,9 +136,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ workspa
     try { await broadcastWorkspaceMessage(workspaceId, message); }
     catch (error) { console.error("Workspace realtime broadcast failed", error instanceof Error ? error.message : "unknown error"); }
   }
-  if (inserted && /(^|\s)@gluk\b/i.test(content)) {
+  if (inserted && /(^|\s)@intelar\b/i.test(content)) {
     after(async () => {
-      const assistantMessageId = `gluk-reply-${message.id}`;
+      const assistantMessageId = `intelar-reply-${message.id}`;
       const createdAt = new Date().toISOString();
       let broadcaster: ReturnType<typeof createWorkspaceRealtimeBroadcaster> | undefined;
       const publish = async (event: string, payload: unknown) => {
@@ -156,8 +156,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ workspa
           createdAt,
           clientMessageId: assistantMessageId,
           requestClientMessageId: message.clientMessageId,
-          userEmail: "gluk@system.local",
-          userName: "Gluk",
+          userEmail: "intelar@system.local",
+          userName: "Intelar",
           role: "assistant",
           content: "",
         });
@@ -243,8 +243,8 @@ ${projectSummaries || "No projects created yet."}
 General Workspace Resources (not tied to a specific project):
 ${generalResources || "No general resources uploaded yet."}
 ${documentContextBlocks.length > 0 ? `\nAuthoritative Attached Document Contents:\n${documentContextBlocks.join("\n\n")}` : ""}`;
-        const context = history.map((item) => `${item.role === "assistant" ? "Gluk" : item.userName}${item.replyTo ? ` (replying to ${item.replyTo.userName}: "${item.replyTo.content.slice(0, 400)}")` : ""}: ${item.content}`).join("\n");
-        const prompt = `You are Gluk, the collaborative AI assistant participating in the shared workspace "${workspace.name}". Reply accurately and helpfully to the latest message. Everyone can see your answer.
+        const context = history.map((item) => `${item.role === "assistant" ? "Intelar" : item.userName}${item.replyTo ? ` (replying to ${item.replyTo.userName}: "${item.replyTo.content.slice(0, 400)}")` : ""}: ${item.content}`).join("\n");
+        const prompt = `You are Intelar, the collaborative AI assistant participating in the shared workspace "${workspace.name}". Reply accurately and helpfully to the latest message. Everyone can see your answer.
 
 ${workspaceContext}
 
@@ -259,7 +259,7 @@ CRITICAL ACCURACY GUIDELINES:
 Recent workspace chat:
 ${context}`;
         const { mastra } = await import("@/mastra");
-        const answer = await mastra.getAgent("glukAgent").stream(prompt, { maxSteps: 5, modelSettings: { maxOutputTokens: 2048 } });
+        const answer = await mastra.getAgent("intelarAgent").stream(prompt, { maxSteps: 5, modelSettings: { maxOutputTokens: 2048 } });
         let text = "";
         let pendingDelta = "";
         let lastSentAt = Date.now();
@@ -275,18 +275,18 @@ ${context}`;
         if (pendingDelta) await publish("assistant_stream", { type: "delta", id: assistantMessageId, delta: pendingDelta });
         text = text.trim();
         if (!text) {
-          await publish("assistant_stream", { type: "error", id: assistantMessageId, requestClientMessageId: message.clientMessageId, content: "Gluk couldn't finish that response. Please try mentioning Gluk again." });
+          await publish("assistant_stream", { type: "error", id: assistantMessageId, requestClientMessageId: message.clientMessageId, content: "Intelar couldn't finish that response. Please try mentioning Intelar again." });
           return;
         }
-        const reply = await insertWorkspaceMessage(workspaceId, "gluk@system.local", "Gluk", "assistant", text, assistantMessageId, assistantMessageId, message.id);
+        const reply = await insertWorkspaceMessage(workspaceId, "intelar@system.local", "Intelar", "assistant", text, assistantMessageId, assistantMessageId, message.id);
         if (reply.inserted) await broadcastWorkspaceMessage(workspaceId, reply.message);
       } catch (error) {
-        console.error("Workspace Gluk reply failed", error instanceof Error ? error.message : "unknown error");
+        console.error("Workspace Intelar reply failed", error instanceof Error ? error.message : "unknown error");
         await publish("assistant_stream", {
           type: "error",
           id: assistantMessageId,
           requestClientMessageId: message.clientMessageId,
-          content: "Gluk couldn't finish that response. Please try mentioning Gluk again.",
+          content: "Intelar couldn't finish that response. Please try mentioning Intelar again.",
         });
       } finally {
         if (broadcaster) await broadcaster.close();

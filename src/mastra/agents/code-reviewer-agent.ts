@@ -2,7 +2,7 @@ import { Agent } from "@mastra/core/agent";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || "gluk-local-key",
+    apiKey: process.env.OPENROUTER_API_KEY || "intelar-local-key",
 });
 
 export const CODE_REVIEWER_INSTRUCTIONS = `You are the Code Reviewer Agent — a Senior Principal Systems Architect and Application Security Auditor.

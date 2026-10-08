@@ -1,5 +1,5 @@
 /**
- * Automated test suite for Gluk's Temporal Grounding and Freshness Mechanism.
+ * Automated test suite for Intelar's Temporal Grounding and Freshness Mechanism.
  *
  * Covers:
  * 1. Runtime System Clock & Timezone-Aware Context
@@ -25,7 +25,7 @@ import {
     DEFAULT_TIMEZONE,
 } from "../src/lib/temporal";
 import { computeFreshnessScore, sourceRerankTool } from "../src/mastra/tools/source-rerank-tool";
-import { glukAgent } from "../src/mastra/agents/gluk-agent";
+import { intelarAgent } from "../src/mastra/agents/intelar-agent";
 import { RequestContext } from "@mastra/core/request-context";
 
 let passed = 0;
@@ -43,7 +43,7 @@ function assert(condition: boolean, message: string) {
 
 async function runTests() {
     console.log("\n========================================================");
-    console.log("  GLUK TEMPORAL GROUNDING & FRESHNESS TEST SUITE");
+    console.log("  INTELAR TEMPORAL GROUNDING & FRESHNESS TEST SUITE");
     console.log("========================================================\n");
 
     const systemNow = new Date();
@@ -198,7 +198,7 @@ async function runTests() {
 
     const reqCtx = new RequestContext();
     reqCtx.set("timezone", "Africa/Lagos");
-    const dynamicInstructions = await glukAgent.getInstructions({ requestContext: reqCtx });
+    const dynamicInstructions = await intelarAgent.getInstructions({ requestContext: reqCtx });
     const instructionsStr = typeof dynamicInstructions === "string" ? dynamicInstructions : JSON.stringify(dynamicInstructions);
 
     assert(instructionsStr.includes(String(ctx.year)), `Instructions contain current year ${ctx.year}`);
@@ -211,7 +211,7 @@ async function runTests() {
 
     // 6a. "What's today's date?"
     console.log("  Executing query: \"What's today's date?\"...");
-    const dateResponse = await glukAgent.generate("What's today's date?", {
+    const dateResponse = await intelarAgent.generate("What's today's date?", {
         requestContext: reqCtx,
         modelSettings: { maxOutputTokens: 200 },
     });
@@ -231,7 +231,7 @@ async function runTests() {
 
     // 6b. "What day is it?"
     console.log("\n  Executing query: \"What day is it?\"...");
-    const dayResponse = await glukAgent.generate("What day is it?", {
+    const dayResponse = await intelarAgent.generate("What day is it?", {
         requestContext: reqCtx,
         modelSettings: { maxOutputTokens: 200 },
     });
@@ -243,7 +243,7 @@ async function runTests() {
 
     // 6c. "What happened today?" (verification of temporal awareness)
     console.log("\n  Executing query: \"What happened today?\" (verifying temporal anchoring)...");
-    const todayEventResponse = await glukAgent.generate(
+    const todayEventResponse = await intelarAgent.generate(
         "What happened today? State today's date and give a brief 1-sentence note of what date you are grounding to.",
         {
             requestContext: reqCtx,
@@ -258,7 +258,7 @@ async function runTests() {
 
     // 6d. "What happened this week?" (verification of temporal window)
     console.log("\n  Executing query: \"What happened this week?\"...");
-    const weekResponse = await glukAgent.generate(
+    const weekResponse = await intelarAgent.generate(
         "What happened this week? In 2 sentences, specify the date range for 'this week' and confirm the calendar year.",
         {
             requestContext: reqCtx,
@@ -273,7 +273,7 @@ async function runTests() {
 
     // 6e. "What is the latest information about X?"
     console.log("\n  Executing query: \"What is the latest information about artificial intelligence?\"...");
-    const latestResponse = await glukAgent.generate(
+    const latestResponse = await intelarAgent.generate(
         "What is the latest information about artificial intelligence? In 2 sentences, what year are you treating as the current year?",
         {
             requestContext: reqCtx,

@@ -1085,7 +1085,7 @@ function LearningCourse({ userEmail, theme = "dark" }: LearningHomeProps & { use
                                         Generate Source-Grounded Lessons ({activeLessons.length} Topics)
                                     </h2>
                                     <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl leading-relaxed">
-                                        Gluk will extract authorized excerpts from your selected documents, generate grounded lesson explanations, verify source references, and create 3 practice questions per lesson.
+                                        Intelar will extract authorized excerpts from your selected documents, generate grounded lesson explanations, verify source references, and create 3 practice questions per lesson.
                                     </p>
                                 </div>
 

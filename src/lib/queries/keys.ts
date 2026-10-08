@@ -1,4 +1,7 @@
 export const queryKeys = {
+    settings: {
+        detail: (userEmail: string) => ["settings", userEmail] as const,
+    },
     conversations: {
         all: ["conversations"] as const,
         list: (userEmail: string) => ["conversations", "list", userEmail] as const,

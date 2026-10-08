@@ -95,7 +95,7 @@ export async function POST(
             from: process.env.RESEND_FROM_EMAIL,
             to: email,
             subject: `Invitation to ${workspace.name}`,
-            html: `<p>${escapeHtml(session.user.name ?? session.user.email)} invited you to join <strong>${escapeHtml(workspace.name)}</strong> on Gluk.</p><p><a href="${inviteUrl}">Accept invitation</a></p><p>This invitation expires in 7 days.</p>`,
+            html: `<p>${escapeHtml(session.user.name ?? session.user.email)} invited you to join <strong>${escapeHtml(workspace.name)}</strong> on Intelar.</p><p><a href="${inviteUrl}">Accept invitation</a></p><p>This invitation expires in 7 days.</p>`,
           }),
         });
         sent = response.ok;

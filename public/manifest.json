@@ -1,6 +1,6 @@
 {
-  "name": "Gluk Learning",
-  "short_name": "Gluk",
+  "name": "Intelar Learning",
+  "short_name": "Intelar",
   "description": "AI research agent and offline-first personal learning for university students",
   "start_url": "/learn",
   "display": "standalone",

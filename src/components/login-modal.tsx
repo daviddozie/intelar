@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import GlukLogo from "./svg";
+import IntelarLogo from "./svg";
 import { Google } from "./svg";
 import { Sparkles, ShieldCheck, Database, Zap, X } from "lucide-react";
 
@@ -44,7 +44,7 @@ export default function LoginModal({
 
     const handleGoogleSignIn = async () => {
         setIsLoading(true);
-        await signIn("google", { callbackUrl: "/" });
+        await signIn("google", { callbackUrl: "/chat" });
     };
 
     const handleGoToLogin = () => {
@@ -184,14 +184,14 @@ export default function LoginModal({
                                     : "bg-black/5 border-black/10 text-black shadow-md"
                             }`}
                         >
-                            <GlukLogo size={36} />
+                            <IntelarLogo size={36} />
                         </div>
 
                         <h2
                             id="login-modal-title"
                             className="text-xl sm:text-2xl font-semibold tracking-tight mb-2"
                         >
-                            Log in to continue with Gluk
+                            Log in to continue with Intelar
                         </h2>
 
                         <p

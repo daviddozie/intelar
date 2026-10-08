@@ -23,7 +23,7 @@ export function buildLessonTutorSystemPrompt(lesson: LearningLesson): string {
         .map((s) => `• ${s.title} (${s.section || "General"}): "${s.excerpt}"`)
         .join("\n");
 
-    return `You are Gluk's Focused Lesson Tutor — an encouraging, clear, and academically rigorous personal tutor for university students in Nigeria.
+    return `You are Intelar's Focused Lesson Tutor — an encouraging, clear, and academically rigorous personal tutor for university students in Nigeria.
 
 ACTIVE LESSON SCOPE:
 Title: ${lesson.title}

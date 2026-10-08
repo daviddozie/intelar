@@ -78,7 +78,7 @@ async function browseGitHubSource(config: McpSourceConfig): Promise<McpBrowseRes
     try {
         const headers: Record<string, string> = {
             "Accept": "application/vnd.github.v3+json",
-            "User-Agent": "Gluk-MCP-Client/1.0",
+            "User-Agent": "Intelar-MCP-Client/1.0",
         };
         if (config.githubToken) {
             headers["Authorization"] = `Bearer ${config.githubToken}`;
@@ -232,7 +232,7 @@ async function fetchGoogleDocOrFile(
         redirect: "follow",
         signal: AbortSignal.timeout(15_000),
         headers: {
-            "User-Agent": "Mozilla/5.0 (compatible; GlukResourceBot/1.0)",
+            "User-Agent": "Mozilla/5.0 (compatible; IntelarResourceBot/1.0)",
         },
     });
 
@@ -437,7 +437,7 @@ async function browseCustomMcpServer(config: McpSourceConfig): Promise<McpBrowse
     try {
         const url = new URL(serverUrl);
         transport = new SSEClientTransport(url);
-        client = new Client({ name: "gluk-client", version: "1.0.0" }, { capabilities: {} });
+        client = new Client({ name: "intelar-client", version: "1.0.0" }, { capabilities: {} });
 
         await client.connect(transport);
         const result = await client.listResources();
@@ -485,7 +485,7 @@ export async function fetchMcpResourceContent(
 ): Promise<{ text: string; buffer: Buffer; mimeType: string }> {
     // 1. Direct GitHub Raw fetch
     if (item.provider === "github") {
-        const headers: Record<string, string> = { "User-Agent": "Gluk-MCP-Client/1.0" };
+        const headers: Record<string, string> = { "User-Agent": "Intelar-MCP-Client/1.0" };
         if (config?.githubToken) headers["Authorization"] = `Bearer ${config.githubToken}`;
 
         const res = await fetch(item.uri, { headers, signal: AbortSignal.timeout(20_000) });
@@ -505,7 +505,7 @@ export async function fetchMcpResourceContent(
             redirect: "follow",
             signal: AbortSignal.timeout(20_000),
             headers: {
-                "User-Agent": "Mozilla/5.0 (compatible; GlukResourceBot/1.0)",
+                "User-Agent": "Mozilla/5.0 (compatible; IntelarResourceBot/1.0)",
             },
         });
         if (!res.ok) {
@@ -519,7 +519,7 @@ export async function fetchMcpResourceContent(
     // 3. Custom MCP Server readResource
     if (item.provider === "custom" && config?.serverUrl) {
         const transport = new SSEClientTransport(new URL(config.serverUrl));
-        const client = new Client({ name: "gluk-client", version: "1.0.0" }, { capabilities: {} });
+        const client = new Client({ name: "intelar-client", version: "1.0.0" }, { capabilities: {} });
         try {
             await client.connect(transport);
             const res = await client.readResource({ uri: item.uri });
@@ -556,7 +556,7 @@ export async function fetchMcpResourceContent(
 }
 
 /**
- * Ingest selected MCP resources into the user's Gluk Resources and Vector Store
+ * Ingest selected MCP resources into the user's Intelar Resources and Vector Store
  */
 export async function ingestMcpResources(
     userEmail: string,
@@ -581,7 +581,7 @@ export async function ingestMcpResources(
             // Process document for chunking & vector extraction
             const processed = await processDocument(buffer, item.name, mimeType);
 
-            // Persist into Gluk's resources table
+            // Persist into Intelar's resources table
             await saveUserResources(userEmail, [
                 {
                     name: item.name,
@@ -652,5 +652,5 @@ function generateDemonstrationDocText(item: McpResourceItem): string {
         return `# Distributed Caching Architectures\n\n## 1. Cache Topologies\nIn distributed systems, caching reduces database load and network latency. Common patterns include Cache-Aside (Lazy Loading), Write-Through, and Write-Behind.\n\n## 2. Eviction Policies\nWhen memory capacity is reached, eviction algorithms like LRU (Least Recently Used), LFU (Least Frequently Used), and FIFO determine which keys are pruned.\n\n## 3. Preventing Cache Stampede\nCache stampedes occur when heavily queried keys expire simultaneously. Mitigations include probabilistic early expiration (XFetch algorithm) and distributed mutex locking.`;
     }
 
-    return `# ${item.name.replace(/_/g, " ").replace(/\.[^.]+$/, "")}\n\n## Document Overview\nThis document was imported from ${item.provider} via Model Context Protocol (MCP).\n\n## Content Summary\n${item.description || "Comprehensive notes, data tables, and study resources."}\n\nGenerated for Gluk personalized learning and research workflows.`;
+    return `# ${item.name.replace(/_/g, " ").replace(/\.[^.]+$/, "")}\n\n## Document Overview\nThis document was imported from ${item.provider} via Model Context Protocol (MCP).\n\n## Content Summary\n${item.description || "Comprehensive notes, data tables, and study resources."}\n\nGenerated for Intelar personalized learning and research workflows.`;
 }

@@ -13,18 +13,18 @@ type UseWorkspaceRealtimeOptions = {
   userEmail?: string | null;
   queryClient: QueryClient;
   setWorkspaceMessages: Dispatch<SetStateAction<Message[]>>;
-  setGlukResponding: Dispatch<SetStateAction<boolean>>;
+  setIntelarResponding: Dispatch<SetStateAction<boolean>>;
   setOnlineMembers: Dispatch<SetStateAction<WorkspaceMember[]>>;
   setTypingMembers: Dispatch<SetStateAction<Record<string, { name: string; avatarUrl?: string | null }>>>;
   setSocketReady: Dispatch<SetStateAction<boolean>>;
   setError: Dispatch<SetStateAction<string>>;
   ephemeralRef: RefObject<RealtimeChannel | null>;
-  glukPendingRef: RefObject<Map<string, ReturnType<typeof setTimeout>>>;
+  intelarPendingRef: RefObject<Map<string, ReturnType<typeof setTimeout>>>;
   typingTimersRef: RefObject<Map<string, ReturnType<typeof setTimeout>>>;
   typingClearTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
 };
 
-export function useWorkspaceRealtime({ status, tab, workspaceId, userEmail, queryClient: qc, setWorkspaceMessages, setGlukResponding, setOnlineMembers, setTypingMembers, setSocketReady, setError, ephemeralRef, glukPendingRef, typingTimersRef, typingClearTimerRef }: UseWorkspaceRealtimeOptions) {
+export function useWorkspaceRealtime({ status, tab, workspaceId, userEmail, queryClient: qc, setWorkspaceMessages, setIntelarResponding, setOnlineMembers, setTypingMembers, setSocketReady, setError, ephemeralRef, intelarPendingRef, typingTimersRef, typingClearTimerRef }: UseWorkspaceRealtimeOptions) {
   const base = `/api/workspaces/${workspaceId}`;
   const cursorRef = useRef<{ createdAt: string; id: string } | null>(null);
   useEffect(() => {
@@ -78,9 +78,9 @@ export function useWorkspaceRealtime({ status, tab, workspaceId, userEmail, quer
             void qc.invalidateQueries({ queryKey: ["workspace-resources", workspaceId] });
           }
           if (incoming.role === "assistant") {
-            for (const timer of glukPendingRef.current.values()) clearTimeout(timer);
-            glukPendingRef.current.clear();
-            setGlukResponding(false);
+            for (const timer of intelarPendingRef.current.values()) clearTimeout(timer);
+            intelarPendingRef.current.clear();
+            setIntelarResponding(false);
           }
           if (incoming.userEmail !== tokenResponse.email) void api(`${base}/read`, { method: "POST" }).then(() => qc.invalidateQueries({ queryKey: ["workspaces"] })).catch(() => undefined);
         });
@@ -109,14 +109,14 @@ export function useWorkspaceRealtime({ status, tab, workspaceId, userEmail, quer
             delta?: string;
           };
           if (event.type === "start") {
-            const requestTimer = event.requestClientMessageId ? glukPendingRef.current.get(event.requestClientMessageId) : undefined;
+            const requestTimer = event.requestClientMessageId ? intelarPendingRef.current.get(event.requestClientMessageId) : undefined;
             if (requestTimer) clearTimeout(requestTimer);
-            if (event.requestClientMessageId) glukPendingRef.current.delete(event.requestClientMessageId);
-            setGlukResponding(false);
+            if (event.requestClientMessageId) intelarPendingRef.current.delete(event.requestClientMessageId);
+            setIntelarResponding(false);
             setWorkspaceMessages((current) => mergeMessages(current, [{
               id: event.id,
-              userEmail: event.userEmail ?? "gluk@system.local",
-              userName: event.userName ?? "Gluk",
+              userEmail: event.userEmail ?? "intelar@system.local",
+              userName: event.userName ?? "Intelar",
               role: "assistant",
               content: "",
               createdAt: event.createdAt ?? new Date().toISOString(),
@@ -132,27 +132,27 @@ export function useWorkspaceRealtime({ status, tab, workspaceId, userEmail, quer
             return;
           }
           if (event.type === "error") {
-            const requestTimer = event.requestClientMessageId ? glukPendingRef.current.get(event.requestClientMessageId) : undefined;
+            const requestTimer = event.requestClientMessageId ? intelarPendingRef.current.get(event.requestClientMessageId) : undefined;
             if (requestTimer) clearTimeout(requestTimer);
-            if (event.requestClientMessageId) glukPendingRef.current.delete(event.requestClientMessageId);
+            if (event.requestClientMessageId) intelarPendingRef.current.delete(event.requestClientMessageId);
             setWorkspaceMessages((current) => {
               if (current.some((item) => item.id === event.id)) {
                 return current.map((item) => item.id === event.id
-                  ? { ...item, content: event.content ?? "Gluk couldn't finish that response.", isStreaming: false }
+                  ? { ...item, content: event.content ?? "Intelar couldn't finish that response.", isStreaming: false }
                   : item);
               }
               return mergeMessages(current, [{
                 id: event.id,
-                userEmail: "gluk@system.local",
-                userName: "Gluk",
+                userEmail: "intelar@system.local",
+                userName: "Intelar",
                 role: "assistant",
-                content: event.content ?? "Gluk couldn't finish that response.",
+                content: event.content ?? "Intelar couldn't finish that response.",
                 createdAt: new Date().toISOString(),
                 clientMessageId: event.id,
                 isStreaming: false,
               }]);
             });
-            setGlukResponding(false);
+            setIntelarResponding(false);
           }
         });
         ephemeral.on("presence", { event: "sync" }, () => {

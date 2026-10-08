@@ -1,6 +1,6 @@
 "use client";
 
-import GlukLogo from "@/components/svg";
+import IntelarLogo from "@/components/svg";
 import { Google, Github } from "@/components/svg";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,7 @@ export default function LoginPage() {
     );
     return requested?.startsWith("/") && !requested.startsWith("//")
       ? requested
-      : "/";
+      : "/chat";
   };
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(true);
@@ -107,12 +107,12 @@ export default function LoginPage() {
           <div
             className={`w-14 h-14 rounded-2xl border flex items-center justify-center mb-5 ${logoBox} ${logoColor}`}
           >
-            <GlukLogo size={36} />
+            <IntelarLogo size={36} />
           </div>
           <h1
             className={`text-2xl font-semibold tracking-tight mb-1 ${heading}`}
           >
-            Research smarter with Gluk
+            Research smarter with Intelar
           </h1>
           <p className={`text-sm text-center leading-relaxed ${sub}`}>
             AI-powered research — search the web, analyse documents,
@@ -180,7 +180,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className={`text-center text-xs mt-5 ${foot}`}>
-          By continuing, you agree to Gluk&apos;s{" "}
+          By continuing, you agree to Intelar&apos;s{" "}
           <span className={`cursor-pointer transition-colors ${footHi}`}>
             Terms
           </span>{" "}

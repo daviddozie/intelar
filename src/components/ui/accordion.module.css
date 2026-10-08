@@ -1,0 +1,6 @@
+.content { overflow: hidden; }
+.content[data-state="open"] { animation: expand 220ms ease-out; }
+.content[data-state="closed"] { animation: collapse 180ms ease-in; }
+@keyframes expand { from { height: 0; } to { height: var(--radix-accordion-content-height); } }
+@keyframes collapse { from { height: var(--radix-accordion-content-height); } to { height: 0; } }
+@media (prefers-reduced-motion: reduce) { :global(html:not([data-motion="full"])) .content { animation: none !important; } }

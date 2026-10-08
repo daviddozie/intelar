@@ -1,6 +1,6 @@
-# Gluk — Agent Guide
+# Intelar — Agent Guide
 
-Gluk is a TypeScript full-stack research chat app. The UI and HTTP API run on Next.js; Mastra provides the chat agents and structured research workflow. Make the smallest coherent change that fits the existing boundaries, and preserve unrelated user changes.
+Intelar is a TypeScript full-stack research chat app. The UI and HTTP API run on Next.js; Mastra provides the chat agents and structured research workflow. Make the smallest coherent change that fits the existing boundaries, and preserve unrelated user changes.
 
 ## Before changing code
 
@@ -16,7 +16,7 @@ Gluk is a TypeScript full-stack research chat app. The UI and HTTP API run on Ne
 - `src/lib/queries/`: TanStack Query keys and API functions for server-backed conversations and resources. Keep API calls and query/mutation cache policy here or in focused hooks.
 - `src/lib/`: auth, Turso/LibSQL persistence, document parsing, embeddings, Pinecone vector search, and temporal/freshness helpers.
 - `src/mastra/index.ts`: Mastra registration, storage, logging, and observability.
-- `src/mastra/agents/`: main Gluk agent, instructions, and delegated fact-checker/code-reviewer agents.
+- `src/mastra/agents/`: main Intelar agent, instructions, and delegated fact-checker/code-reviewer agents.
 - `src/mastra/tools/`: web search/fetch/reranking, report and digest export, webhook, and agent delegation tools.
 - `src/mastra/workflows/research/`: typed research pipeline steps and helpers; assembled in `research-workflow.ts` (plan → gather → deep-fetch → rerank → synthesise).
 - `public/`: static assets. `scripts/`: manual utility scripts. `.env.example`: environment variable names; never put real credentials here.
@@ -65,7 +65,7 @@ After each milestone:
 - Record material decisions and their reasons.
 - Update PLAN.md when discoveries require implementation changes.
 
-Preserve unrelated changes and existing Gluk functionality.
+Preserve unrelated changes and existing Intelar functionality.
 Keep deferred features outside the current implementation.
 Never claim verification passed without running the relevant checks.
 

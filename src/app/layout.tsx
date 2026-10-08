@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
+import SettingsDialog from "@/components/settings-dialog";
+import HelpDialog from "@/components/help-dialog";
+import { PreferencesProvider } from "@/context/preferences-context";
+import { HelpProvider } from "@/context/help-context";
 import AuthProvider from "@/components/auth-provider";
 import QueryProvider from "@/components/query-provider";
 import { ChatProvider } from "@/context/chat-context";
@@ -18,17 +22,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://gluk.vercel.app"),
+  metadataBase: new URL("https://intelar.vercel.app"),
 
   title: {
-    default: "Gluk – AI Research Agent for Fast, Deep Insights",
-    template: "%s | Gluk AI",
+    default: "Intelar – AI Research Agent for Fast, Deep Insights",
+    template: "%s | Intelar AI",
   },
 
   description:
-    "Gluk is an AI research agent that automates deep research, gathers information from multiple sources, and generates structured insights for developers, students, and researchers.",
+    "Intelar is an AI research agent that automates deep research, gathers information from multiple sources, and generates structured insights for developers, students, and researchers.",
 
-  applicationName: "Gluk",
+  applicationName: "Intelar",
 
   keywords: [
     "AI research agent",
@@ -41,24 +45,24 @@ export const metadata: Metadata = {
 
   authors: [{ name: "David Dozie" }],
   creator: "David Dozie",
-  publisher: "Gluk",
+  publisher: "Intelar",
 
   alternates: {
     canonical: "/",
   },
 
   openGraph: {
-    title: "Gluk – AI Research Agent",
+    title: "Intelar – AI Research Agent",
     description:
-      "Automate deep research and generate structured insights with Gluk.",
-    url: "https://gluk.vercel.app",
-    siteName: "Gluk",
+      "Automate deep research and generate structured insights with Intelar.",
+    url: "https://intelar.vercel.app",
+    siteName: "Intelar",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Gluk AI Research Agent",
+        alt: "Intelar AI Research Agent",
       },
     ],
     locale: "en_US",
@@ -67,7 +71,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Gluk – AI Research Agent",
+    title: "Intelar – AI Research Agent",
     description:
       "AI-powered research agent for fast, structured insights.",
     images: ["/og-image.png"],
@@ -86,12 +90,12 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Gluk",
+  name: "Intelar",
   applicationCategory: "AIApplication",
   operatingSystem: "Web",
   description:
-    "Gluk is an AI research agent that automates deep research, gathers information from multiple sources, and generates structured insights.",
-  url: "https://gluk.vercel.app",
+    "Intelar is an AI research agent that automates deep research, gathers information from multiple sources, and generates structured insights.",
+  url: "https://intelar.vercel.app",
   creator: {
     "@type": "Person",
     name: "David Mgbede",
@@ -109,7 +113,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <Script id="theme-init" strategy="beforeInteractive">
-          {`(function(){try{var saved=localStorage.getItem("theme");var dark=saved==="dark"||(saved!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var root=document.documentElement;root.classList.toggle("dark",dark);root.style.colorScheme=dark?"dark":"light";}catch(_){}})();`}
+          {`(function(){try{var cached=JSON.parse(localStorage.getItem("intelar_preferences:guest")||"null");var saved=cached&&cached.preferences?cached.preferences.theme:localStorage.getItem("theme");var dark=saved==="dark"||(saved!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var root=document.documentElement;root.classList.toggle("dark",dark);root.style.colorScheme=dark?"dark":"light";var motion=cached&&cached.preferences?cached.preferences.motion:"system";root.dataset.motion=motion;root.dataset.reducedMotion=String(motion==="reduced"||(motion!=="full"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches));}catch(_){}})();`}
         </Script>
         <Script
           id="json-ld"
@@ -118,17 +122,23 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <div style={{ display: "none" }}>
-          Gluk is an AI research agent that automates deep research, gathers
+          Intelar is an AI research agent that automates deep research, gathers
           information from multiple sources, and generates structured insights
           for developers, students, and researchers.
         </div>
 
         <AuthProvider>
           <QueryProvider>
-            <ChatProvider>
-              <ServiceWorkerRegister />
-              {children}
-            </ChatProvider>
+            <PreferencesProvider>
+              <HelpProvider>
+                <ChatProvider>
+                  <ServiceWorkerRegister />
+                  {children}
+                  <SettingsDialog />
+                  <HelpDialog />
+                </ChatProvider>
+              </HelpProvider>
+            </PreferencesProvider>
           </QueryProvider>
         </AuthProvider>
       </body>

@@ -1,57 +1,20 @@
-interface GlukLogoProps {
+interface IntelarLogoProps {
     size?: number;
     className?: string;
 }
 
-export default function GlukLogo({ size = 32, className = "" }: GlukLogoProps) {
+export default function IntelarLogo({ size = 32, className = "" }: IntelarLogoProps) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 100 100"
-            fill="none"
+            viewBox="0 0 524 445"
+            fill="currentColor"
             width={size}
             height={size}
             className={className}
         >
-            <defs>
-
-                <clipPath id="bounds">
-                    <rect x="0" y="0" width="100" height="100" />
-                </clipPath>
-
-
-                <mask id="slashMask">
-                    <rect width="100" height="100" fill="white" />
-
-                    <polygon
-                        points="72,10 80,18 28,90 20,82"
-                        fill="black"
-                    />
-                </mask>
-            </defs>
-
-
-            <circle
-                cx="50" cy="50" r="33"
-                stroke="currentColor" strokeWidth="8"
-                mask="url(#slashMask)"
-                opacity="1"
-            />
-
-
-            <polygon
-                points="72,10 80,18 28,90 20,82"
-                fill="currentColor"
-                opacity="1"
-                clipPath="url(#bounds)"
-            />
-
-
-            <polygon points="76,6 82,12 74,14 70,8" fill="currentColor" opacity="1" />
-
-
-            <polygon points="24,86 30,92 26,96 18,88" fill="currentColor" opacity="1" />
-
+            <path d="M5 0H23C75 0 119 44 119 96V440Q119 445 114 445H96C43 445 0 402 0 349V5Q0 0 5 0Z" />
+            <path d="M149 223C149 123 232 47 334 47C437 47 524 126 524 223V440Q524 445 519 445H473C439 445 413 419 413 386V219C413 176 379 146 334 146C289 146 255 176 255 219V440Q255 445 250 445H204C173 445 149 423 149 392Z" />
         </svg>
     );
 }

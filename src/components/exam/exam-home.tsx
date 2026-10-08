@@ -369,7 +369,7 @@ export default function ExamHome({
                 }}
                 onExit={() => {
                     try {
-                        sessionStorage.removeItem(`gluk_exam_active_${activeExam.id}`);
+                        sessionStorage.removeItem(`intelar_exam_active_${activeExam.id}`);
                     } catch {}
                     setView("dashboard");
                     setActiveExam(null);
@@ -388,7 +388,7 @@ export default function ExamHome({
                 theme={theme}
                 onRetake={() => {
                     try {
-                        sessionStorage.removeItem(`gluk_exam_active_${activeExam.id}`);
+                        sessionStorage.removeItem(`intelar_exam_active_${activeExam.id}`);
                     } catch {}
                     setActiveAttempt(null);
                     setView("playing");

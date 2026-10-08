@@ -1,4 +1,4 @@
-import { glukAgent } from "../../agents/gluk-agent";
+import { intelarAgent } from "../../agents/intelar-agent";
 import type { RawSource, RankedSource, Confidence } from "./schemas";
 import {
     getSystemTemporalContext,
@@ -116,7 +116,7 @@ export async function runWebFetch(
         const timeout = setTimeout(() => controller.abort(), 8000);
         const response = await fetch(url, {
             signal: controller.signal,
-            headers: { "User-Agent": "Mozilla/5.0 (compatible; GlukResearch/1.0)" },
+            headers: { "User-Agent": "Mozilla/5.0 (compatible; IntelarResearch/1.0)" },
         });
         clearTimeout(timeout);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -230,7 +230,7 @@ Example output for a current topic: ["example topic overview", "example topic ${
 Now generate for the query above.`;
 
     try {
-        const response = await glukAgent.generate(prompt, {
+        const response = await intelarAgent.generate(prompt, {
             modelSettings: {
                 maxOutputTokens: 500,
             },

@@ -72,7 +72,7 @@ export const exportReportTool = createTool({
         try {
             if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY) {
                 const uploadResult = await cloudinary.uploader.upload(dataUri, {
-                    folder: "gluk/exports",
+                    folder: "intelar/exports",
                     resource_type: "raw",
                     public_id: filename,
                 });

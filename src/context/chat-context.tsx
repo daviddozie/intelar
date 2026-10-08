@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { usePreferences } from "@/context/preferences-context";
 import { Conversation } from "@/types/chat";
 import { ResourceReference } from "@/types/resource";
 import { useRouter, usePathname } from "next/navigation";
@@ -20,6 +21,7 @@ interface ChatContextType {
     activeConversationId: string | null;
     activeConversation: Conversation | null;
     isLoadingInitial: boolean;
+    isLoadingConversations: boolean;
     conversationsError: string | null;
     isRetryingConversations: boolean;
     retryConversations: () => void;
@@ -69,11 +71,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     );
     const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
     const isLoadingInitial = status === "loading" || (isAuthenticated && conversationsQuery.isPending);
+    const isLoadingConversations = isAuthenticated && conversationsQuery.isPending;
     const [isLoadingThread, setIsLoadingThread] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [sidebarPreferenceLoaded, setSidebarPreferenceLoaded] = useState(false);
-    const [theme, setTheme] = useState<"light" | "dark">("dark");
+    const { theme, updatePreferences } = usePreferences();
     const [documentReference, setDocumentReference] = useState<ResourceReference | null>(null);
 
     const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -141,40 +144,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
     // Restore the user's sidebar preference, with a sensible responsive default on first visit.
     useEffect(() => {
-        const storedPreference = localStorage.getItem("gluk_sidebar_open");
+        const storedPreference = localStorage.getItem("intelar_sidebar_open");
         setSidebarOpen(storedPreference === null ? window.innerWidth >= 768 : storedPreference === "true");
         setSidebarPreferenceLoaded(true);
     }, []);
 
     useEffect(() => {
-        if (sidebarPreferenceLoaded) localStorage.setItem("gluk_sidebar_open", String(sidebarOpen));
+        if (sidebarPreferenceLoaded) localStorage.setItem("intelar_sidebar_open", String(sidebarOpen));
     }, [sidebarOpen, sidebarPreferenceLoaded]);
 
-    // Theme initialization
-    useEffect(() => {
-        const root = document.documentElement;
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const initialTheme = storedTheme === "light" || storedTheme === "dark"
-            ? storedTheme
-            : (systemPrefersDark ? "dark" : "light");
-
-        setTheme(initialTheme);
-        root.classList.add("theme-transition");
-        root.classList.toggle("dark", initialTheme === "dark");
-        root.style.colorScheme = initialTheme;
-    }, []);
-
     const toggleTheme = useCallback(() => {
-        const root = document.documentElement;
-        setTheme((curr) => {
-            const nextTheme = curr === "dark" ? "light" : "dark";
-            localStorage.setItem("theme", nextTheme);
-            root.classList.toggle("dark", nextTheme === "dark");
-            root.style.colorScheme = nextTheme;
-            return nextTheme;
-        });
-    }, []);
+        updatePreferences({ theme: theme === "dark" ? "light" : "dark" });
+    }, [theme, updatePreferences]);
 
     const setConversations = useCallback<React.Dispatch<React.SetStateAction<Conversation[]>>>((update) => {
         if (!isAuthenticated || !userEmail) {
@@ -238,11 +219,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         } catch (err) {
             if (isCancelledError(err) || deletingConversationIdsRef.current.has(id)) return;
             if (err instanceof Error && err.message === "Conversation not found") {
-                router.replace("/");
+                router.replace("/chat");
                 return;
             }
             console.error(`Failed to load thread ${id}:`, err);
-            router.replace("/");
+            router.replace("/chat");
         } finally {
             threadLoadsInFlightRef.current.delete(id);
             setIsLoadingThread(false);
@@ -262,7 +243,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         setDocumentReference(reference ?? null);
         setActiveConversationId(null);
         setConversations((prev) => prev.filter((c) => c.messages.length > 0));
-        router.push("/", { scroll: false });
+        router.push("/chat", { scroll: false });
         if (window.innerWidth < 768) setSidebarOpen(false);
     }, [router, setConversations]);
 
@@ -293,8 +274,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         if (pathname.startsWith("/c/")) {
             if (status === "loading") return;
             if (!isAuthenticated) {
-                // Guests do not have thread memory; redirect to '/'
-                router.replace("/");
+                // Guests do not have thread memory; redirect to '/chat'
+                router.replace("/chat");
                 return;
             }
             const idFromPath = pathname.replace("/c/", "");
@@ -306,8 +287,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
                 if (activeConversation && activeConversation.messages.length === 0) return;
                 ensureThreadLoaded(idFromPath);
             }
-        } else if (pathname === "/") {
-            // When at '/', stay on a new chat without an ID until a query is sent.
+        } else if (pathname === "/chat") {
+            // When at '/chat', stay on a new chat without an ID until a query is sent.
             // If the browser URL was just updated to /c/[id] (e.g. user just sent a message), do not reset.
             if (typeof window !== "undefined" && window.location.pathname.startsWith("/c/")) {
                 return;
@@ -325,6 +306,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         activeConversationId,
         activeConversation,
         isLoadingInitial,
+        isLoadingConversations,
         conversationsError,
         isRetryingConversations: conversationsQuery.isFetching,
         retryConversations: () => { void conversationsQuery.refetch(); },

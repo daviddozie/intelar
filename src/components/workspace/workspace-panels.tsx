@@ -37,7 +37,7 @@ type ProjectsPanelProps = {
   onDescriptionChange: (value: string) => void;
   onCreate: () => void;
   onResourceUploaded?: () => void;
-  onAskGlukAboutProject?: (project: WorkspaceProject) => void;
+  onAskIntelarAboutProject?: (project: WorkspaceProject) => void;
   onSharePersonalResource?: (url: string, projectId?: string | null) => Promise<void> | void;
   onAttachWorkspaceResource?: (resourceId: string, projectId: string | null) => Promise<void> | void;
   onDeleteWorkspaceResource?: (resourceId: string) => Promise<void> | void;
@@ -57,7 +57,7 @@ export function WorkspaceProjectsPanel({
   onDescriptionChange,
   onCreate,
   onResourceUploaded,
-  onAskGlukAboutProject,
+  onAskIntelarAboutProject,
   onSharePersonalResource,
   onAttachWorkspaceResource,
   onDeleteWorkspaceResource,
@@ -216,18 +216,18 @@ export function WorkspaceProjectsPanel({
                 </div>
               </SheetHeader>
 
-              {/* Quick actions: Ask Gluk */}
-              {onAskGlukAboutProject && (
+              {/* Quick actions: Ask Intelar */}
+              {onAskIntelarAboutProject && (
                 <div className="pt-1">
                   <Button
                     onClick={() => {
-                      onAskGlukAboutProject(selectedProject);
+                      onAskIntelarAboutProject(selectedProject);
                       setSelectedProject(null);
                     }}
                     className="w-full h-10 justify-center gap-2 rounded-full bg-white text-black font-medium text-xs sm:text-sm hover:bg-white/90 shadow-sm border-0 transition-all cursor-pointer"
                   >
                     <Bot className="h-4 w-4 text-black" />
-                    Ask @Gluk about {selectedProject.name}
+                    Ask @Intelar about {selectedProject.name}
                   </Button>
                 </div>
               )}
