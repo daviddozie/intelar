@@ -1,5 +1,7 @@
 "use client";
 
+import { TooltipButton } from "@/components/ui/tooltip-button";
+
 import { useState, useRef } from "react";
 import { usePreferences } from "@/context/preferences-context";
 import { useHelp } from "@/context/help-context";
@@ -41,6 +43,7 @@ import {
   UsersRound,
   GraduationCap,
   ClipboardCheck,
+  Share2,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -58,6 +61,7 @@ interface SidebarProps {
   examPrepActive?: boolean;
   onDelete: (id: string) => void;
   onPin: (id: string, pinned: boolean) => void;
+  onShare?: (conv: Conversation) => void;
   isOpen: boolean;
   onToggle: () => void;
   theme: "light" | "dark";
@@ -83,6 +87,7 @@ export default function Sidebar({
   examPrepActive = false,
   onDelete,
   onPin,
+  onShare,
   isOpen,
   onToggle,
   theme,
@@ -137,7 +142,7 @@ export default function Sidebar({
             className={`shrink-0 ${isDark ? "" : "invert"}`}
           />
           <div className="flex items-center gap-1">
-            <button
+            <TooltipButton
               onClick={onNew}
               className={`p-1.5 rounded-lg cursor-pointer transition-colors ${
                 isDark
@@ -156,8 +161,8 @@ export default function Sidebar({
               >
                 <path d="M12 5v14M5 12h14" />
               </svg>
-            </button>
-            <button
+            </TooltipButton>
+            <TooltipButton
               onClick={onToggle}
               className={`p-1.5 rounded-lg cursor-pointer transition-colors ${
                 isDark
@@ -176,14 +181,14 @@ export default function Sidebar({
               >
                 <path d="M15 18l-6-6 6-6" />
               </svg>
-            </button>
+            </TooltipButton>
           </div>
         </div>
       ) : (
         <div
           className={`flex flex-col items-center gap-4 py-5 border-b transition-colors duration-300 ${isDark ? "border-white/6" : "border-black/10"}`}
         >
-          <button
+          <TooltipButton
             type="button"
             onClick={onToggle}
             className={`w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer transition-colors ${isDark ? "text-white hover:bg-white/8" : "text-black hover:bg-black/6"}`}
@@ -197,9 +202,9 @@ export default function Sidebar({
               height={34}
               className={isDark ? "" : "invert"}
             />
-          </button>
+          </TooltipButton>
           {session?.user && (
-            <button
+            <TooltipButton
               type="button"
               onClick={onToggle}
               className={`w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer transition-colors ${isDark ? "text-white/60 hover:text-white hover:bg-white/8" : "text-black/55 hover:text-black hover:bg-black/6"}`}
@@ -207,7 +212,7 @@ export default function Sidebar({
               aria-label="Open chat search"
             >
               <Search className="w-5 h-5" />
-            </button>
+            </TooltipButton>
           )}
         </div>
       )}
@@ -276,7 +281,7 @@ export default function Sidebar({
       )}
 
       {!isOpen && (
-        <button
+        <TooltipButton
           type="button"
           onClick={onLearn}
           className={`mx-auto mt-3 flex h-10 w-10 items-center justify-center rounded-lg cursor-pointer transition-colors ${
@@ -292,10 +297,10 @@ export default function Sidebar({
           aria-label="Learn"
         >
           <GraduationCap className="h-5 w-5" />
-        </button>
+        </TooltipButton>
       )}
       {!isOpen && (
-        <button
+        <TooltipButton
           type="button"
           onClick={onExamPrep}
           className={`mx-auto mt-1 flex h-10 w-10 items-center justify-center rounded-lg cursor-pointer transition-colors ${
@@ -311,10 +316,10 @@ export default function Sidebar({
           aria-label="Exam Prep"
         >
           <ClipboardCheck className="h-5 w-5" />
-        </button>
+        </TooltipButton>
       )}
       {!isOpen && (
-        <button
+        <TooltipButton
           type="button"
           onClick={onResources}
           className={`mx-auto mt-1 flex h-10 w-10 items-center justify-center rounded-lg cursor-pointer transition-colors ${resourcesActive ? (isDark ? "bg-white/10 text-white" : "bg-black/8 text-black") : isDark ? "text-white/60 hover:bg-white/8 hover:text-white" : "text-black/60 hover:bg-black/6 hover:text-black"}`}
@@ -322,10 +327,10 @@ export default function Sidebar({
           aria-label="Resources"
         >
           <FolderOpen className="h-5 w-5" />
-        </button>
+        </TooltipButton>
       )}
       {!isOpen && session?.user && (
-        <button
+        <TooltipButton
           type="button"
           onClick={onWorkspaces}
           className={`mx-auto mt-1 flex h-10 w-10 items-center justify-center rounded-lg cursor-pointer transition-colors ${workspacesActive ? (isDark ? "bg-white/10 text-white" : "bg-black/8 text-black") : isDark ? "text-white/60 hover:bg-white/8 hover:text-white" : "text-black/60 hover:bg-black/6 hover:text-black"}`}
@@ -333,7 +338,7 @@ export default function Sidebar({
           aria-label="Workspaces"
         >
           <UsersRound className="h-5 w-5" />
-        </button>
+        </TooltipButton>
       )}
 
       {/* Search field - Authenticated users only */}
@@ -425,6 +430,7 @@ export default function Sidebar({
                         setDeleteTarget({ id, title: conv.title })
                       }
                       onPin={onPin}
+                      onShare={onShare}
                     />
                   ))}
                   {unpinned.length > 0 && (
@@ -449,6 +455,7 @@ export default function Sidebar({
                   onSelect={onSelect}
                   onDelete={(id) => setDeleteTarget({ id, title: conv.title })}
                   onPin={onPin}
+                  onShare={onShare}
                 />
               ))}
             </>
@@ -471,14 +478,14 @@ export default function Sidebar({
           </div>
         ) : !session?.user ? (
           !isOpen ? (
-            <button
+            <TooltipButton
               onClick={() => window.location.assign("/login")}
               className={`w-full flex justify-center py-2 rounded-lg ${isDark ? "text-white/70" : "text-black/70"}`}
               title="Log in"
               aria-label="Log in"
             >
               <LogIn className="w-5 h-5" />
-            </button>
+            </TooltipButton>
           ) : (
             <div
               className={`p-3 rounded-xl border transition-colors ${
@@ -511,7 +518,7 @@ export default function Sidebar({
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button ref={accountTrigger}
+              <TooltipButton ref={accountTrigger}
                 className={`w-full flex items-center ${isOpen ? "gap-2 px-2" : "justify-center px-0"} py-2 rounded-lg cursor-pointer transition-colors group ${
                   isDark ? "hover:bg-white/6" : "hover:bg-black/6"
                 }`}
@@ -547,7 +554,7 @@ export default function Sidebar({
                     className={`w-3.5 h-3.5 shrink-0 ${isDark ? "text-white/40" : "text-black/40"}`}
                   />
                 )}
-              </button>
+              </TooltipButton>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
@@ -638,7 +645,7 @@ export default function Sidebar({
           </DropdownMenu>
         )}
       </div>
-      {!session?.user && !isAuthLoading && <button aria-label="Open settings" onClick={(event) => openSettings(event.currentTarget)} className={`mx-3 mb-3 flex cursor-pointer items-center justify-center gap-2 rounded-full border px-3 py-2 text-xs ${isDark ? "border-white/10 text-white/70 hover:bg-white/5" : "border-black/10 text-black/70 hover:bg-black/5"}`}><Settings size={14} />{isOpen && "Settings"}</button>}
+      {!session?.user && !isAuthLoading && <TooltipButton tooltip={!isOpen ? "Settings" : false} aria-label="Open settings" onClick={(event) => openSettings(event.currentTarget)} className={`mx-3 mb-3 flex cursor-pointer items-center justify-center gap-2 rounded-full border px-3 py-2 text-xs ${isDark ? "border-white/10 text-white/70 hover:bg-white/5" : "border-black/10 text-black/70 hover:bg-black/5"}`}><Settings size={14} />{isOpen && "Settings"}</TooltipButton>}
       <Dialog
         open={deleteTarget !== null}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
@@ -700,6 +707,7 @@ interface ConvRowProps {
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
   onPin: (id: string, pinned: boolean) => void;
+  onShare?: (conv: Conversation) => void;
 }
 
 function ConvRow({
@@ -709,6 +717,7 @@ function ConvRow({
   onSelect,
   onDelete,
   onPin,
+  onShare,
 }: ConvRowProps) {
   return (
     <div
@@ -746,7 +755,7 @@ function ConvRow({
       {/* 3-dot menu — visible on hover / when active */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
+          <TooltipButton
             onClick={(e) => e.stopPropagation()}
             className={`opacity-0 group-hover:opacity-100 p-1 rounded cursor-pointer transition-all shrink-0 focus:opacity-100 ${
               isDark
@@ -756,7 +765,7 @@ function ConvRow({
             title="More options"
           >
             <MoreHorizontal className="w-3.5 h-3.5" />
-          </button>
+          </TooltipButton>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
@@ -781,6 +790,21 @@ function ConvRow({
             )}
             {conv.pinned ? "Unpin chat" : "Pin chat"}
           </DropdownMenuItem>
+
+          {onShare && (
+            <DropdownMenuItem
+              onSelect={() => onShare(conv)}
+              onClick={(e) => e.stopPropagation()}
+              className={`gap-2 cursor-pointer text-xs ${
+                isDark
+                  ? "text-white/70 hover:text-white focus:text-white focus:bg-white/6"
+                  : "text-black/70 hover:text-black focus:text-black focus:bg-black/6"
+              }`}
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              Share chat
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuSeparator
             className={isDark ? "bg-white/6" : "bg-black/10"}

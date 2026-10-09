@@ -1,4 +1,5 @@
 import { createClient } from "@libsql/client";
+import { nanoid } from "nanoid";
 
 // Lazy singleton — only created at runtime, not at build time
 let _turso: ReturnType<typeof createClient> | null = null;
@@ -72,6 +73,23 @@ export async function initDB() {
         await db.execute(`ALTER TABLE conversations ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0`);
     } catch {
         // Column already exists — ignore
+    }
+    await db.execute(`
+    CREATE TABLE IF NOT EXISTS shared_conversations (
+      id TEXT PRIMARY KEY,
+      conversation_id TEXT NOT NULL,
+      user_email TEXT NOT NULL,
+      title TEXT NOT NULL,
+      messages TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      view_count INTEGER NOT NULL DEFAULT 0
+    )
+  `);
+    try {
+        await db.execute(`CREATE INDEX IF NOT EXISTS idx_shared_conversations_conv_id ON shared_conversations(conversation_id)`);
+    } catch {
+        // Index exists or not supported
     }
 }
 
@@ -433,4 +451,72 @@ export async function pinConversation(userEmail: string, id: string, pinned: boo
         sql: `UPDATE conversations SET pinned = ? WHERE id = ? AND user_email = ?`,
         args: [pinned ? 1 : 0, id, userEmail],
     });
+}
+
+export async function createSharedConversationSnapshot(
+    userEmail: string,
+    conversationId: string,
+    title: string,
+    messages: unknown[]
+): Promise<string> {
+    await initDB();
+    const shareId = nanoid(12);
+    const now = new Date().toISOString();
+    await getDB().execute({
+        sql: `INSERT INTO shared_conversations (id, conversation_id, user_email, title, messages, created_at, updated_at, view_count)
+              VALUES (?, ?, ?, ?, ?, ?, ?, 0)`,
+        args: [shareId, conversationId, userEmail, title, JSON.stringify(messages), now, now],
+    });
+    return shareId;
+}
+
+export async function getSharedConversationSnapshot(shareId: string) {
+    await initDB();
+    const result = await getDB().execute({
+        sql: `SELECT * FROM shared_conversations WHERE id = ? LIMIT 1`,
+        args: [shareId],
+    });
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0];
+
+    // Increment view count asynchronously
+    void getDB().execute({
+        sql: `UPDATE shared_conversations SET view_count = view_count + 1 WHERE id = ?`,
+        args: [shareId],
+    }).catch(() => {});
+
+    return {
+        id: row.id as string,
+        conversationId: row.conversation_id as string,
+        userEmail: row.user_email as string,
+        title: row.title as string,
+        messages: JSON.parse(row.messages as string),
+        createdAt: new Date(row.created_at as string),
+        updatedAt: new Date(row.updated_at as string),
+        viewCount: ((row.view_count as number) || 0) + 1,
+    };
+}
+
+export async function deleteSharedConversationSnapshot(userEmail: string, shareId: string): Promise<boolean> {
+    await initDB();
+    const result = await getDB().execute({
+        sql: `DELETE FROM shared_conversations WHERE id = ? AND user_email = ?`,
+        args: [shareId, userEmail],
+    });
+    return result.rowsAffected > 0;
+}
+
+export async function getUserSharedConversations(userEmail: string) {
+    await initDB();
+    const result = await getDB().execute({
+        sql: `SELECT id, conversation_id, title, created_at, view_count FROM shared_conversations WHERE user_email = ? ORDER BY created_at DESC`,
+        args: [userEmail],
+    });
+    return result.rows.map((row) => ({
+        id: row.id as string,
+        conversationId: row.conversation_id as string,
+        title: row.title as string,
+        createdAt: new Date(row.created_at as string),
+        viewCount: row.view_count as number,
+    }));
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { TooltipButton } from "@/components/ui/tooltip-button";
+
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Message } from "@/types/chat";
@@ -525,13 +527,13 @@ function TtsControls({
 
   if (state === "idle") {
     return (
-      <button onClick={handleFirstPlay} title="Read aloud" className={btnClass}>
+      <TooltipButton onClick={handleFirstPlay} title="Read aloud" className={btnClass}>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
           <path d="M19.07 4.93a10 10 0 0 1 0 14.14" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
         </svg>
         Speak
-      </button>
+      </TooltipButton>
     );
   }
 
@@ -549,32 +551,32 @@ function TtsControls({
   return (
     <div className="flex items-center gap-0.5">
       {state === "playing" ? (
-        <button onClick={handlePause} title="Pause" className={activeBtnClass}>
+        <TooltipButton onClick={handlePause} title="Pause" className={activeBtnClass}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
             <rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" />
           </svg>
           Pause
-        </button>
+        </TooltipButton>
       ) : (
-        <button onClick={handleResume} title="Resume" className={activeBtnClass}>
+        <TooltipButton onClick={handleResume} title="Resume" className={activeBtnClass}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
             <polygon points="5 3 19 12 5 21 5 3" />
           </svg>
           Resume
-        </button>
+        </TooltipButton>
       )}
-      <button onClick={handleRestart} title="Restart from beginning" className={activeBtnClass}>
+      <TooltipButton onClick={handleRestart} title="Restart from beginning" className={activeBtnClass}>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 .49-4.5" />
         </svg>
         Restart
-      </button>
-      <button onClick={handleStop} title="Stop" className={activeBtnClass}>
+      </TooltipButton>
+      <TooltipButton onClick={handleStop} title="Stop" className={activeBtnClass}>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
           <rect x="4" y="4" width="16" height="16" rx="2" />
         </svg>
         Stop
-      </button>
+      </TooltipButton>
     </div>
   );
 }

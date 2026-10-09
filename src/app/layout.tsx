@@ -9,6 +9,8 @@ import AuthProvider from "@/components/auth-provider";
 import QueryProvider from "@/components/query-provider";
 import { ChatProvider } from "@/context/chat-context";
 import ServiceWorkerRegister from "@/components/service-worker-register";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -127,20 +129,23 @@ export default function RootLayout({
           for developers, students, and researchers.
         </div>
 
-        <AuthProvider>
-          <QueryProvider>
-            <PreferencesProvider>
-              <HelpProvider>
-                <ChatProvider>
-                  <ServiceWorkerRegister />
-                  {children}
-                  <SettingsDialog />
-                  <HelpDialog />
-                </ChatProvider>
-              </HelpProvider>
-            </PreferencesProvider>
-          </QueryProvider>
-        </AuthProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <QueryProvider>
+              <PreferencesProvider>
+                <HelpProvider>
+                  <ChatProvider>
+                    <ServiceWorkerRegister />
+                    {children}
+                    <SettingsDialog />
+                    <HelpDialog />
+                    <Toaster position="top-center" />
+                  </ChatProvider>
+                </HelpProvider>
+              </PreferencesProvider>
+            </QueryProvider>
+          </AuthProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

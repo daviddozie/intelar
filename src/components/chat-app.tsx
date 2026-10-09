@@ -1,5 +1,7 @@
 "use client";
 
+import { TooltipButton } from "@/components/ui/tooltip-button";
+
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,7 +11,9 @@ import ChatWindowSkeleton from "@/components/chat-window-skeleton";
 import ChatInput, { AttachedFile } from "@/components/chat-input";
 import { Message, Conversation } from "@/types/chat";
 import { nanoid } from "nanoid";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Share2, Loader2 } from "lucide-react";
+import ShareConversationDialog from "@/components/share-conversation-dialog";
+import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChat } from "@/context/chat-context";
 import { useSession } from "next-auth/react";
@@ -82,7 +86,83 @@ export default function ChatApp({
     "chat" | "resources" | "workspaces" | "workspace" | "learn" | "exam-prep"
   >(initialView);
   const [mounted, setMounted] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareDialog, setShareDialog] = useState<{ url: string; title: string } | null>(null);
   useEffect(() => setMounted(true), []);
+
+  // Restore forked shared conversation if navigated from a shared link
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const forkedChatRaw = localStorage.getItem("intelar_fork_chat");
+    if (!forkedChatRaw) return;
+    localStorage.removeItem("intelar_fork_chat");
+
+    try {
+      const parsed = JSON.parse(forkedChatRaw);
+      if (parsed && Array.isArray(parsed.messages) && parsed.messages.length > 0) {
+        const newId = nanoid();
+        const forkedConversation: Conversation = {
+          id: newId,
+          title: parsed.title ? `Copy of ${parsed.title}` : "Shared Conversation",
+          messages: parsed.messages.map((m: any) => ({
+            ...m,
+            createdAt: new Date(m.createdAt || Date.now()),
+          })),
+          createdAt: new Date(),
+        };
+
+        setConversations((prev) => [forkedConversation, ...prev.filter((c) => c.messages.length > 0)]);
+        setActiveConversationId(newId);
+        debounceSave(forkedConversation);
+        router.push(`/c/${newId}`, { scroll: false });
+        toast.info("Continuing conversation in a new chat");
+      }
+    } catch (e) {
+      console.error("Failed to restore forked conversation", e);
+    }
+  }, [setConversations, setActiveConversationId, debounceSave, router]);
+
+  const handleShareConversation = async (targetConv?: Conversation) => {
+    if (isSharing) return;
+    const convToShare = targetConv || activeConversation;
+    if (!convToShare || !convToShare.messages || convToShare.messages.length === 0) {
+      toast.error("Cannot share an empty conversation");
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setLoginModalMode("new_chat");
+      setShowLoginModal(true);
+      toast.error("Please sign in to share conversations");
+      return;
+    }
+
+    try {
+      setIsSharing(true);
+      const res = await fetch(`/api/conversations/${encodeURIComponent(convToShare.id)}/share`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: convToShare.title,
+          messages: convToShare.messages,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to create share link");
+      }
+
+      const data = await res.json();
+      const shareUrl = `${window.location.origin}${data.url}`;
+      setShareDialog({ url: shareUrl, title: convToShare.title || "Shared conversation" });
+    } catch (err: unknown) {
+      console.error("Failed to share conversation:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to share conversation");
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   useEffect(
     () => setActiveView(initialView),
@@ -488,6 +568,7 @@ export default function ChatApp({
           examPrepActive={activeView === "exam-prep"}
           onDelete={deleteConversationById}
           onPin={pinConversationById}
+          onShare={handleShareConversation}
           isOpen={sidebarOpen}
           onToggle={() => setSidebarOpen((v) => !v)}
           theme={theme}
@@ -503,7 +584,7 @@ export default function ChatApp({
       <div className="relative flex min-h-0 min-w-0 w-full flex-1 flex-col">
         {/* Top Header — permanently solid, never flickers */}
         <div className="flex items-center h-14 px-4 border-b border-border/60 transition-colors duration-300">
-          <button
+          <TooltipButton aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
             onClick={() => setSidebarOpen((v) => !v)}
             className="mr-3 p-2 rounded-lg hover:bg-black/6 dark:hover:bg-white/6 cursor-pointer transition-colors shrink-0"
           >
@@ -519,7 +600,7 @@ export default function ChatApp({
               <line x1="3" y1="12" x2="21" y2="12" />
               <line x1="3" y1="18" x2="21" y2="18" />
             </svg>
-          </button>
+          </TooltipButton>
           <span className="text-sm font-medium text-foreground/70 truncate">
             {activeView === "exam-prep"
               ? "Exam Prep"
@@ -570,7 +651,30 @@ export default function ChatApp({
               )
             )}
 
-            <button
+            {activeView === "chat" && activeConversation && activeConversation.messages.length > 0 && (
+              <TooltipButton
+                onClick={() => handleShareConversation()}
+                disabled={isSharing}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors border shrink-0 ${
+                  theme === "dark"
+                      ? "border-white/10 hover:bg-white/6 text-white/80 hover:text-white"
+                      : "border-black/10 hover:bg-black/6 text-black/80 hover:text-black"
+                }`}
+                title="Share conversation"
+                aria-label="Share conversation"
+              >
+                {isSharing ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Share2 className="w-3.5 h-3.5" />
+                )}
+                <span className="hidden sm:inline">
+                  Share
+                </span>
+              </TooltipButton>
+            )}
+
+            <TooltipButton
               suppressHydrationWarning
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-black/6 dark:hover:bg-white/6 cursor-pointer transition-all duration-300 shrink-0"
@@ -582,8 +686,8 @@ export default function ChatApp({
               ) : (
                 <Moon className="w-4.5 h-4.5" />
               )}
-            </button>
-            <button
+            </TooltipButton>
+            <TooltipButton
               onClick={handleNewChat}
               className="p-2 rounded-lg hover:bg-black/6 dark:hover:bg-white/6 cursor-pointer transition-colors shrink-0"
               title="New chat"
@@ -598,7 +702,7 @@ export default function ChatApp({
               >
                 <path d="M12 5v14M5 12h14" />
               </svg>
-            </button>
+            </TooltipButton>
           </div>
         </div>
 
@@ -666,6 +770,14 @@ export default function ChatApp({
       </div>
 
       {/* Login modal (either ChatGPT-style New Chat prompt or 3-prompt trial limit) */}
+      {shareDialog && (
+        <ShareConversationDialog
+          key={shareDialog.url}
+          url={shareDialog.url}
+          title={shareDialog.title}
+          onClose={() => setShareDialog(null)}
+        />
+      )}
       <LoginModal
         isOpen={showLoginModal}
         mode={loginModalMode}

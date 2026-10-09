@@ -1,5 +1,7 @@
 "use client";
 
+import { TooltipButton } from "@/components/ui/tooltip-button";
+
 import React, { useEffect, useState, useCallback } from "react";
 import { X, Download, FileSpreadsheet, Loader2, AlertCircle } from "lucide-react";
 import { FileIcon, getFileCategory } from "@public/svg/icon";
@@ -121,7 +123,7 @@ export default function DocumentViewer({
             >
                 {/* Left: Close button + Breadcrumb */}
                 <div className="flex items-center gap-3 min-w-0 mr-4">
-                    <button
+                    <TooltipButton
                         onClick={onClose}
                         className={`p-2 rounded-lg cursor-pointer transition-colors shrink-0 ${
                             isDark
@@ -132,7 +134,7 @@ export default function DocumentViewer({
                         aria-label="Close document"
                     >
                         <X className="w-4 h-4" />
-                    </button>
+                    </TooltipButton>
 
                     <div className="flex items-center gap-2 min-w-0 text-sm">
                         <span className={`text-xs ${isDark ? "text-white/40" : "text-black/40"}`}>

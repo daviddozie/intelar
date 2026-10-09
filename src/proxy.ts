@@ -1,8 +1,9 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
+import { authSecret } from "./lib/auth-secret";
 
 export default async function proxy(req: NextRequest) {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const token = await getToken({ req, secret: authSecret });
     const { pathname } = req.nextUrl;
 
     // Allow auth routes and login page

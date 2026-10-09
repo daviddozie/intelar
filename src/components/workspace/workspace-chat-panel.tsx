@@ -1,4 +1,6 @@
 "use client";
+
+import { TooltipButton } from "@/components/ui/tooltip-button";
 import { Fragment, useEffect, useMemo, type Dispatch, type FormEvent, type RefObject, type SetStateAction } from "react";
 import Image from "next/image";
 import { AtSign, Bot, Check, CircleAlert, Clock3, FileText, Mail, MessageSquareReply, MessageSquareText, Plus, Send, SmilePlus, UsersRound, X } from "lucide-react";
@@ -120,7 +122,7 @@ function WorkspaceFilePreviewChip({
         </div>
       </div>
 
-      <button
+      <TooltipButton
         type="button"
         onClick={onRemove}
         className={`shrink-0 ml-1 w-5 h-5 rounded-full flex items-center justify-center cursor-pointer transition-colors ${
@@ -132,7 +134,7 @@ function WorkspaceFilePreviewChip({
         aria-label={`Remove ${file.name}`}
       >
         <X className="w-3.5 h-3.5" />
-      </button>
+      </TooltipButton>
     </div>
   );
 }
@@ -178,7 +180,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                             {QUICK_WORKSPACE_REACTIONS.map((emoji) => {
                               const isReacted = (m.reactions ?? []).some((r) => r.emoji === emoji && r.reacted);
                               return (
-                                <button
+                                <TooltipButton
                                   key={emoji}
                                   type="button"
                                   onClick={() => void toggleReaction(m, emoji)}
@@ -189,11 +191,11 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                                   }`}
                                 >
                                   {emoji}
-                                </button>
+                                </TooltipButton>
                               );
                             })}
-                            <button type="button" onClick={() => setReactionPickerFor(reactionPickerFor === m.id ? null : m.id)} aria-label="Choose reaction" title="Choose reaction" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><SmilePlus className="h-4 w-4" /></button>
-                            <button type="button" onClick={() => beginReply(m)} aria-label="Reply to Intelar" title="Reply" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><MessageSquareReply className="h-4 w-4" /></button>
+                            <TooltipButton type="button" onClick={() => setReactionPickerFor(reactionPickerFor === m.id ? null : m.id)} aria-label="Choose reaction" title="Choose reaction" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><SmilePlus className="h-4 w-4" /></TooltipButton>
+                            <TooltipButton type="button" onClick={() => beginReply(m)} aria-label="Reply to Intelar" title="Reply" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><MessageSquareReply className="h-4 w-4" /></TooltipButton>
                           </div>}
                           {reactionPickerFor === m.id && <div className="absolute right-3 top-11 z-30"><WorkspaceEmojiPicker onClose={() => setReactionPickerFor(null)} onSelect={(emoji) => void toggleReaction(m, emoji)} /></div>}
                           <div className="mb-1 flex items-center gap-2 px-1 text-[11px] text-muted-foreground">
@@ -216,7 +218,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                           {QUICK_WORKSPACE_REACTIONS.map((emoji) => {
                             const isReacted = (m.reactions ?? []).some((r) => r.emoji === emoji && r.reacted);
                             return (
-                              <button
+                              <TooltipButton
                                 key={emoji}
                                 type="button"
                                 onClick={() => void toggleReaction(m, emoji)}
@@ -227,11 +229,11 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                                 }`}
                               >
                                 {emoji}
-                              </button>
+                              </TooltipButton>
                             );
                           })}
-                          <button type="button" onClick={() => setReactionPickerFor(reactionPickerFor === m.id ? null : m.id)} aria-label="Choose reaction" title="Choose reaction" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><SmilePlus className="h-4 w-4" /></button>
-                          <button type="button" onClick={() => beginReply(m)} aria-label={`Reply to ${senderName}`} title="Reply" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><MessageSquareReply className="h-4 w-4" /></button>
+                          <TooltipButton type="button" onClick={() => setReactionPickerFor(reactionPickerFor === m.id ? null : m.id)} aria-label="Choose reaction" title="Choose reaction" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><SmilePlus className="h-4 w-4" /></TooltipButton>
+                          <TooltipButton type="button" onClick={() => beginReply(m)} aria-label={`Reply to ${senderName}`} title="Reply" className="grid h-7 w-7 place-items-center rounded-md hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><MessageSquareReply className="h-4 w-4" /></TooltipButton>
                         </div>}
                         {reactionPickerFor === m.id && <div className={`absolute top-10 z-30 ${isOwn ? "right-14" : "left-14"}`}><WorkspaceEmojiPicker onClose={() => setReactionPickerFor(null)} onSelect={(emoji) => void toggleReaction(m, emoji)} /></div>}
                         {!isOwn && <MemberAvatar name={senderName} src={avatarUrl} />}
@@ -244,7 +246,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                             {isOwn && m.deliveryStatus === "sending" && <Clock3 aria-label="Sending" className="h-3 w-3" />}
                             {isOwn && m.deliveryStatus === "sent" && <Check aria-label="Sent" className="h-3.5 w-3.5 text-sky-500" />}
                             {isOwn && m.deliveryStatus === "failed" && (
-                              <button
+                              <TooltipButton
                                 type="button"
                                 onClick={() => void deliverWorkspaceMessage(m)}
                                 aria-label="Message failed. Retry sending"
@@ -253,7 +255,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                               >
                                 <CircleAlert className="h-3.5 w-3.5" />
                                 <span>Retry</span>
-                              </button>
+                              </TooltipButton>
                             )}
                           </div>
                           <div className={`rounded-2xl px-3.5 py-2.5 ${isMentionForMe ? "rounded-br-md bg-sky-500/15 text-foreground" : isOwn ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md border border-border/70 bg-card"}`}>
@@ -291,7 +293,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
               onSubmit={submitMessage}
               className="mb-3 mt-2 shrink-0 rounded-2xl border border-border bg-card p-2 shadow-md sm:p-2.5"
             >
-              {replyTo && <div className="mb-2 flex items-start gap-3 rounded-xl bg-muted/60 px-3 py-2"><div className="min-w-0 flex-1 border-l-2 border-sky-500 pl-2"><p className="text-xs font-medium">Replying to {replyTo.userName}</p><p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{replyTo.content}</p></div><button type="button" onClick={() => setReplyTo(null)} aria-label="Cancel reply" title="Cancel reply" className="rounded-md p-1 text-muted-foreground hover:bg-background hover:text-foreground"><X className="h-4 w-4" /></button></div>}
+              {replyTo && <div className="mb-2 flex items-start gap-3 rounded-xl bg-muted/60 px-3 py-2"><div className="min-w-0 flex-1 border-l-2 border-sky-500 pl-2"><p className="text-xs font-medium">Replying to {replyTo.userName}</p><p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{replyTo.content}</p></div><TooltipButton type="button" onClick={() => setReplyTo(null)} aria-label="Cancel reply" title="Cancel reply" className="rounded-md p-1 text-muted-foreground hover:bg-background hover:text-foreground"><X className="h-4 w-4" /></TooltipButton></div>}
               <input ref={fileInputRef} type="file" multiple className="sr-only" onChange={(event) => handleFilesSelected(event.currentTarget.files)} />
               {attachedFiles.length > 0 && (
                 <div className="flex gap-2.5 px-2 pt-1 pb-2 flex-wrap">
@@ -345,15 +347,15 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
               </div>
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-1">
-                  <button type="button" onClick={() => fileInputRef.current?.click()} aria-label="Add files" title="Add files" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Plus className="h-4 w-4" /></button>
+                  <TooltipButton type="button" onClick={() => fileInputRef.current?.click()} aria-label="Add files" title="Add files" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Plus className="h-4 w-4" /></TooltipButton>
                   <div className="relative">
-                    <button type="button" onClick={() => setEmojiPickerOpen((open) => !open)} aria-label="Insert emoji" aria-expanded={emojiPickerOpen} title="Add emoji" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><SmilePlus className="h-4 w-4" /></button>
+                    <TooltipButton type="button" onClick={() => setEmojiPickerOpen((open) => !open)} aria-label="Insert emoji" aria-expanded={emojiPickerOpen} title="Add emoji" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><SmilePlus className="h-4 w-4" /></TooltipButton>
                     {emojiPickerOpen && <div className="absolute bottom-full left-0 z-40 mb-2"><WorkspaceEmojiPicker onClose={() => setEmojiPickerOpen(false)} onSelect={(emoji) => { insertComposerText(emoji); setEmojiPickerOpen(false); }} /></div>}
                   </div>
-                  <button type="button" onClick={openMentionPicker} aria-label="Mention a member or resource" title="Mention" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><AtSign className="h-4 w-4" /></button>
+                  <TooltipButton type="button" onClick={openMentionPicker} aria-label="Mention a member or resource" title="Mention" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><AtSign className="h-4 w-4" /></TooltipButton>
                   <p className="ml-1 hidden text-[11px] text-muted-foreground sm:block">Enter to send · Shift+Enter for new line</p>
                 </div>
-                <button disabled={!message.trim() && !attachedFiles.length} aria-label="Send message" className="grid h-8 w-8 place-items-center rounded-full bg-foreground text-background transition-opacity disabled:opacity-40"><Send className="h-4 w-4" /></button>
+                <TooltipButton disabled={!message.trim() && !attachedFiles.length} aria-label="Send message" className="grid h-8 w-8 place-items-center rounded-full bg-foreground text-background transition-opacity disabled:opacity-40"><Send className="h-4 w-4" /></TooltipButton>
               </div>
             </form>
           </section>
