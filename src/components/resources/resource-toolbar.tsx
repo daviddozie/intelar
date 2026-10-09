@@ -1,5 +1,7 @@
 "use client";
 
+import { TooltipButton } from "@/components/ui/tooltip-button";
+
 import { ChevronDown, FilePlus2, FolderPlus, LayoutGrid, List, Search, Upload } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { McpIcon } from "@/components/icons/mcp-icon";
@@ -34,8 +36,8 @@ export function ResourceToolbar({ isDark, activeTab, layout, search, canCreateFo
                 </div>
                 <div className="flex w-full items-center gap-2 sm:w-auto">
                     <div className={`flex items-center rounded-xl border p-1 ${isDark ? "border-white/10 bg-white/5" : "border-black/10 bg-black/[0.03]"}`} aria-label="Resource layout">
-                        <button type="button" onClick={() => onLayoutChange("grid")} aria-label="Grid view" title="Grid view" className={`cursor-pointer rounded-lg p-2 ${layout === "grid" ? (isDark ? "bg-white/15" : "bg-black/10") : "opacity-55"}`}><LayoutGrid className="h-4 w-4" /></button>
-                        <button type="button" onClick={() => onLayoutChange("list")} aria-label="List view" title="List view" className={`cursor-pointer rounded-lg p-2 ${layout === "list" ? (isDark ? "bg-white/15" : "bg-black/10") : "opacity-55"}`}><List className="h-4 w-4" /></button>
+                        <TooltipButton type="button" onClick={() => onLayoutChange("grid")} aria-label="Grid view" title="Grid view" className={`cursor-pointer rounded-lg p-2 ${layout === "grid" ? (isDark ? "bg-white/15" : "bg-black/10") : "opacity-55"}`}><LayoutGrid className="h-4 w-4" /></TooltipButton>
+                        <TooltipButton type="button" onClick={() => onLayoutChange("list")} aria-label="List view" title="List view" className={`cursor-pointer rounded-lg p-2 ${layout === "list" ? (isDark ? "bg-white/15" : "bg-black/10") : "opacity-55"}`}><List className="h-4 w-4" /></TooltipButton>
                     </div>
                     <label className={`flex min-w-0 flex-1 items-center gap-2 rounded-xl border px-3 py-2 sm:w-64 sm:flex-none ${isDark ? "border-white/10 bg-white/5" : "border-black/10 bg-black/[0.03]"}`}>
                         <Search className="h-4 w-4 shrink-0 opacity-50" />

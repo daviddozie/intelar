@@ -1,5 +1,7 @@
 "use client";
 
+import { TooltipButton } from "@/components/ui/tooltip-button";
+
 import { Bookmark, Download, FolderPlus, MessageSquareText, MoreHorizontal, Share2, Trash2 } from "lucide-react";
 import { Resource } from "@/types/resource";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -20,9 +22,9 @@ export function ResourceMenu({ resource, isDark, onChat, onFavorite, onDownload,
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button type="button" onClick={(event) => event.stopPropagation()} aria-label={`More options for ${resource.name}`} title="More options" className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors ${isDark ? "bg-white/8 text-white/65 hover:bg-white/15 hover:text-white" : "bg-black/6 text-black/60 hover:bg-black/10 hover:text-black"}`}>
+                <TooltipButton type="button" onClick={(event) => event.stopPropagation()} aria-label={`More options for ${resource.name}`} title="More options" className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors ${isDark ? "bg-white/8 text-white/65 hover:bg-white/15 hover:text-white" : "bg-black/6 text-black/60 hover:bg-black/10 hover:text-black"}`}>
                     <MoreHorizontal className="h-4 w-4" />
-                </button>
+                </TooltipButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className={`w-56 p-2 ${isDark ? "border-white/10 bg-[#252525] text-white" : "border-black/10 bg-white text-black"}`}>
                 <DropdownMenuItem onSelect={() => onChat(resource)} className={itemClass}><MessageSquareText className="h-4 w-4" />Chat about this</DropdownMenuItem>

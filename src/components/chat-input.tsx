@@ -1,5 +1,7 @@
 "use client";
 
+import { TooltipButton } from "@/components/ui/tooltip-button";
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Plus, X, Mic, Paperclip, FolderOpen } from "lucide-react";
 import { FileIcon, getFileCategory } from "@public/svg/icon";
@@ -137,7 +139,7 @@ function FilePreviewChip({
 
             {/* Remove button */}
             {file.status !== "uploading" && (
-                <button
+                <TooltipButton
                     type="button"
                     onClick={onRemove}
                     className={`shrink-0 ml-1 w-5 h-5 rounded-full flex items-center justify-center cursor-pointer transition-colors ${
@@ -148,7 +150,7 @@ function FilePreviewChip({
                     title="Remove file"
                 >
                     <X className="w-3.5 h-3.5" />
-                </button>
+                </TooltipButton>
             )}
         </div>
     );
@@ -399,7 +401,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                         <FileIcon fileName={referenceResource.name} fileType={referenceResource.type} size={25} />
                                     )}
                                     <span className="min-w-0 flex-1 truncate text-xs" title={`Reference: ${referenceResource.name}`}>{referenceResource.name}</span>
-                                    {onRemoveReference && <button type="button" onClick={onRemoveReference} className={`rounded-full p-1 cursor-pointer ${isDark ? "text-white/50 hover:bg-white/10 hover:text-white" : "text-black/50 hover:bg-black/10 hover:text-black"}`} aria-label="Remove document reference"><X className="h-3.5 w-3.5" /></button>}
+                                    {onRemoveReference && <TooltipButton type="button" onClick={onRemoveReference} className={`rounded-full p-1 cursor-pointer ${isDark ? "text-white/50 hover:bg-white/10 hover:text-white" : "text-black/50 hover:bg-black/10 hover:text-black"}`} aria-label="Remove document reference"><X className="h-3.5 w-3.5" /></TooltipButton>}
                                 </div>
                             )}
                             {attachedFiles.map((f) => (
@@ -431,7 +433,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                 </div>
 
                                 {/* Cancel */}
-                                <button
+                                <TooltipButton
                                     onClick={cancelRecording}
                                     className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-all cursor-pointer ${
                                         isDark
@@ -441,10 +443,10 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                     title="Cancel"
                                 >
                                     <X className="w-4 h-4" />
-                                </button>
+                                </TooltipButton>
 
                                 {/* Confirm / send */}
-                                <button
+                                <TooltipButton
                                     onClick={stopRecording}
                                     className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full border-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 transition-all cursor-pointer"
                                     title="Done"
@@ -452,14 +454,14 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                         <path d="M20 6L9 17l-5-5" />
                                     </svg>
-                                </button>
+                                </TooltipButton>
                             </>
                         ) : (
                             /* ── Normal input UI ── */
                             <>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <button
+                                        <TooltipButton
                                             type="button"
                                             disabled={isStreaming || isTranscribing}
                                             className={`flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${isDark ? "text-white/55 hover:bg-white/10 hover:text-white" : "text-black/55 hover:bg-black/8 hover:text-black"}`}
@@ -467,7 +469,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                             aria-label="Open attachment options"
                                         >
                                             <Plus className="h-5 w-5" />
-                                        </button>
+                                        </TooltipButton>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="start" side="top" sideOffset={12} className={`w-[min(24rem,calc(100vw-2rem))] rounded-2xl p-2.5 shadow-2xl ${isDark ? "border-white/8 bg-[#252525] text-white" : "border-black/8 bg-white text-black"}`}>
                                         <DropdownMenuItem
@@ -489,7 +491,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
-                                <button
+                                <TooltipButton
                                     onClick={startRecording}
                                     disabled={isStreaming || isTranscribing}
                                     className={`flex-shrink-0 p-2 rounded-full cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
@@ -502,7 +504,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                     title={isTranscribing ? "Transcribing…" : "Voice input"}
                                 >
                                     <Mic className="w-5 h-5" />
-                                </button>
+                                </TooltipButton>
 
                                 <textarea
                                     ref={textareaRef}
@@ -519,7 +521,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
 
                                 <div className="flex items-center flex-shrink-0">
                                     {isStreaming ? (
-                                        <button
+                                        <TooltipButton aria-label="Stop generating"
                                             onClick={onAbort}
                                             className={`flex items-center justify-center w-8 h-8 rounded-full border cursor-pointer transition-all ${
                                                 isDark
@@ -530,9 +532,9 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                                                 <rect x="6" y="6" width="12" height="12" rx="2" />
                                             </svg>
-                                        </button>
+                                        </TooltipButton>
                                     ) : (
-                                        <button
+                                        <TooltipButton aria-label="Send message"
                                             onClick={handleSend}
                                             disabled={!canSend}
                                             className={`flex items-center justify-center w-8 h-8 rounded-full transition-all ${
@@ -544,7 +546,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                                 <path d="M12 19V5M5 12l7-7 7 7" />
                                             </svg>
-                                        </button>
+                                        </TooltipButton>
                                     )}
                                 </div>
                             </>

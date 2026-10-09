@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
+import { authSecret } from "./auth-secret";
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -13,10 +14,7 @@ export const authOptions: NextAuthOptions = {
             clientSecret: process.env.GITHUB_CLIENT_SECRET!,
         }),
     ],
-    secret:
-        process.env.NEXTAUTH_SECRET ||
-        process.env.AUTH_SECRET ||
-        "intelar-default-session-secret-change-in-production",
+    secret: authSecret,
     session: {
         strategy: "jwt",
     },

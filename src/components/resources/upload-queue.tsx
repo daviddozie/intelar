@@ -1,5 +1,7 @@
 "use client";
 
+import { TooltipButton } from "@/components/ui/tooltip-button";
+
 import { useState } from "react";
 import { AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Folder, LoaderCircle, RotateCcw, X } from "lucide-react";
 import { FileIcon } from "@public/svg/icon";
@@ -46,10 +48,10 @@ export function UploadQueue({ items, isDark, onDismiss, onRetry }: UploadQueuePr
             <div className={`flex items-center gap-3 border-b px-4 py-3 ${isDark ? "border-white/8" : "border-black/8"}`}>
                 <span className="min-w-0 flex-1 truncate text-sm font-medium">{title}</span>
                 <span className={`text-xs ${secondary}`}>{completed}/{items.length}</span>
-                <button type="button" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? "Expand activity" : "Collapse activity"} className={`cursor-pointer rounded-md p-1.5 ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`}>
+                <TooltipButton type="button" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? "Expand activity" : "Collapse activity"} className={`cursor-pointer rounded-md p-1.5 ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`}>
                     {collapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </button>
-                {active === 0 && <button type="button" onClick={onDismiss} aria-label="Dismiss completed activity" className={`cursor-pointer rounded-md p-1.5 ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`}><X className="h-4 w-4" /></button>}
+                </TooltipButton>
+                {active === 0 && <TooltipButton type="button" onClick={onDismiss} aria-label="Dismiss completed activity" className={`cursor-pointer rounded-md p-1.5 ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`}><X className="h-4 w-4" /></TooltipButton>}
             </div>
             {!collapsed && <ul className="max-h-80 divide-y overflow-y-auto">
                 {items.map((item) => {
@@ -76,7 +78,7 @@ export function UploadQueue({ items, isDark, onDismiss, onRetry }: UploadQueuePr
                                 {isRunning && item.kind !== "folder" && <div className={`mt-2 h-1 overflow-hidden rounded-full ${isDark ? "bg-white/10" : "bg-black/10"}`}><div className={`h-full rounded-full transition-[width] ${isDark ? "bg-white/80" : "bg-black/70"}`} style={{ width: `${item.progress}%` }} /></div>}
                             </div>
                             {item.kind === "folder" ? <Folder className="h-6 w-6 shrink-0 opacity-60" /> : <span className="shrink-0" aria-label={`${item.type} file`}><FileIcon fileName={item.name} fileType={item.type} size={30} /></span>}
-                            {isFailed && <button type="button" onClick={() => onRetry(item.id)} aria-label={`Retry ${label.toLowerCase()} ${item.name}`} className={`cursor-pointer rounded-md p-2 ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`}><RotateCcw className="h-4 w-4" /></button>}
+                            {isFailed && <TooltipButton type="button" onClick={() => onRetry(item.id)} aria-label={`Retry ${label.toLowerCase()} ${item.name}`} className={`cursor-pointer rounded-md p-2 ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`}><RotateCcw className="h-4 w-4" /></TooltipButton>}
                         </li>
                     );
                 })}
