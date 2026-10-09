@@ -2,9 +2,10 @@
 
 import { usePreferences } from "@/context/preferences-context";
 import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Bot, X, Send, Loader2 } from "lucide-react";
+import { X, Send, Loader2 } from "lucide-react";
 import type { LearningLesson } from "@/lib/learning-types";
 
 interface TutorMessage {
@@ -128,9 +129,13 @@ export default function LessonTutorDrawer({
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
                 <div className="flex items-center gap-2.5">
-                    <div className="flex items-center justify-center w-7 h-7 rounded-lg border border-border bg-muted/60 text-foreground">
-                        <Bot className="w-4 h-4" />
-                    </div>
+                    <Image
+                        src="/lesson-tutor-icon.png"
+                        alt=""
+                        width={28}
+                        height={28}
+                        className="w-7 h-7 shrink-0"
+                    />
                     <div>
                         <h2 className="text-sm font-semibold">Focused Lesson Tutor</h2>
                         <span className="text-[11px] text-muted-foreground block truncate max-w-[200px]">

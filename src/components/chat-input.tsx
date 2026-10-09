@@ -435,7 +435,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                 {/* Cancel */}
                                 <TooltipButton
                                     onClick={cancelRecording}
-                                    className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-all cursor-pointer ${
+                                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all cursor-pointer ${
                                         isDark
                                             ? "text-white/50 hover:text-white hover:bg-white/10"
                                             : "text-black/40 hover:text-black hover:bg-black/8"
@@ -448,7 +448,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                 {/* Confirm / send */}
                                 <TooltipButton
                                     onClick={stopRecording}
-                                    className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full border-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 transition-all cursor-pointer"
+                                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 transition-all cursor-pointer"
                                     title="Done"
                                 >
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -494,7 +494,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                 <TooltipButton
                                     onClick={startRecording}
                                     disabled={isStreaming || isTranscribing}
-                                    className={`flex-shrink-0 p-2 rounded-full cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                                    className={`flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
                                         isTranscribing
                                             ? isDark ? "text-white/30 animate-pulse" : "text-black/30 animate-pulse"
                                             : isDark
@@ -503,7 +503,7 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                     }`}
                                     title={isTranscribing ? "Transcribing…" : "Voice input"}
                                 >
-                                    <Mic className="w-5 h-5" />
+                                    <Mic className="h-5 w-5" />
                                 </TooltipButton>
 
                                 <textarea
@@ -513,13 +513,13 @@ export default function ChatInput({ onSend, onAbort, isStreaming, theme, referen
                                     onKeyDown={handleKeyDown}
                                     placeholder="Message Intelar..."
                                     rows={1}
-                                    className={`flex-1 bg-transparent text-sm resize-none outline-none leading-6 max-h-[160px] overflow-y-auto transition-colors duration-300 ${
+                                    className={`flex-1 bg-transparent text-sm resize-none outline-none leading-6 min-h-[36px] max-h-[160px] py-1.5 overflow-y-auto transition-colors duration-300 ${
                                         isDark ? "text-white placeholder-white/30" : "text-black placeholder-black/30"
                                     }`}
                                     disabled={isStreaming}
                                 />
 
-                                <div className="flex items-center flex-shrink-0">
+                                <div className="flex h-9 items-center justify-center shrink-0">
                                     {isStreaming ? (
                                         <TooltipButton aria-label="Stop generating"
                                             onClick={onAbort}

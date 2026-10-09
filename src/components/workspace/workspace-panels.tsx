@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Bot, Download, FolderKanban, FolderOpen, LoaderCircle, MessageSquareText, MoreHorizontal, Plus, Search, Share2, Trash2, X } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Download, FolderKanban, FolderOpen, LoaderCircle, MessageSquareText, MoreHorizontal, Plus, Search, Share2, Trash2, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -226,7 +227,7 @@ export function WorkspaceProjectsPanel({
                     }}
                     className="w-full h-10 justify-center gap-2 rounded-full bg-white text-black font-medium text-xs sm:text-sm hover:bg-white/90 shadow-sm border-0 transition-all cursor-pointer"
                   >
-                    <Bot className="h-4 w-4 text-black" />
+                    <Image src="/lesson-tutor-icon.png" alt="" width={18} height={18} className="h-4.5 w-4.5 shrink-0 object-contain" />
                     Ask @Intelar about {selectedProject.name}
                   </Button>
                 </div>
