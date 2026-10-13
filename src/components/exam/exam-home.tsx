@@ -21,6 +21,7 @@ import CreateExamModal from "./create-exam-modal";
 import ExamPlayer from "./exam-player";
 import ExamResultsView from "./exam-results-view";
 import type { ExamAttempt, ExamPrep } from "@/lib/exam-types";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export interface ExamUrlState {
     examId: string | null;
@@ -121,6 +122,9 @@ export default function ExamHome({
     const [isLoading, setIsLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<ExamPrep | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     // Fetch user exams
     const loadExams = useCallback(async () => {
@@ -325,15 +329,18 @@ export default function ExamHome({
         writeExamUrlState({ examId: exam.id, attemptId: attempt.id, view: "results" });
     }
 
-    async function handleDelete(examId: string, e: React.MouseEvent) {
-        e.stopPropagation();
-        if (!confirm("Are you sure you want to delete this exam and its past attempts?")) return;
+    async function handleConfirmDelete() {
+        if (!deleteTarget || isDeleting) return;
+        const examId = deleteTarget.id;
+        setIsDeleting(true);
+        setDeleteError(null);
 
         try {
             const res = await fetch(`/api/exams/${examId}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Could not delete exam");
 
             setExams((prev) => prev.filter((ex) => ex.id !== examId));
+            setDeleteTarget(null);
             if (activeExam?.id === examId) {
                 setView("dashboard");
                 setActiveExam(null);
@@ -341,7 +348,9 @@ export default function ExamHome({
                 writeExamUrlState({ view: "dashboard" });
             }
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to delete exam");
+            setDeleteError(err instanceof Error ? err.message : "Failed to delete exam");
+        } finally {
+            setIsDeleting(false);
         }
     }
 
@@ -524,9 +533,14 @@ export default function ExamHome({
 
                                             <button
                                                 type="button"
-                                                onClick={(e) => handleDelete(ex.id, e)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setDeleteError(null);
+                                                    setDeleteTarget(ex);
+                                                }}
                                                 className="p-1 text-muted-foreground hover:text-destructive cursor-pointer transition-colors"
                                                 title="Delete Exam"
+                                                aria-label={`Delete ${ex.title}`}
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
                                             </button>
@@ -597,6 +611,51 @@ export default function ExamHome({
                     </div>
                 )}
             </div>
+
+            <Dialog
+                open={deleteTarget !== null}
+                onOpenChange={(open) => {
+                    if (!open && !isDeleting) setDeleteTarget(null);
+                }}
+            >
+                <DialogContent className="sm:max-w-md" showCloseButton={!isDeleting}>
+                    <DialogHeader>
+                        <DialogTitle>Delete exam?</DialogTitle>
+                        <DialogDescription className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                            Are you sure you want to delete{" "}
+                            <strong className="text-foreground font-semibold">
+                                &quot;{deleteTarget?.title}&quot;
+                            </strong>
+                            ?
+                            <br />
+                            <br />
+                            This will permanently delete this exam and all its past attempts.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {deleteError && (
+                        <p role="alert" className="text-xs text-destructive">{deleteError}</p>
+                    )}
+                    <DialogFooter className="flex flex-row items-center justify-end gap-2 mt-4 sm:justify-end">
+                        <button
+                            type="button"
+                            disabled={isDeleting}
+                            onClick={() => setDeleteTarget(null)}
+                            className="px-4 py-2 rounded-xl text-xs font-medium cursor-pointer transition-colors border border-border bg-card hover:bg-muted text-foreground disabled:opacity-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            disabled={isDeleting}
+                            onClick={handleConfirmDelete}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-red-600 hover:bg-red-700 text-white cursor-pointer transition-colors disabled:opacity-50"
+                        >
+                            {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                            <span>{isDeleting ? "Deleting…" : "Delete"}</span>
+                        </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Create Exam Dialog */}
             <CreateExamModal
