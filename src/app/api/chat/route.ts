@@ -54,6 +54,7 @@ function isResearchQuery(message: string, timezone: string = DEFAULT_TIMEZONE): 
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions);
     const userEmail = session?.user?.email ?? "guest";
+    const userName = session?.user?.name ?? undefined;
 
     const body = await req.json();
     const { message, threadId, files, useResearch, referenceResource } = body;
@@ -179,7 +180,7 @@ export async function POST(req: NextRequest) {
     (async () => {
         try {
             if (isFileQuestion && hasRagContext) {
-                await streamAgent(agent, fullMessage, threadId, userEmail, userTimezone, writer, encoder);
+                await streamAgent(agent, fullMessage, threadId, userEmail, userTimezone, userName, writer, encoder);
             } else if (shouldUseResearch) {
                 let inWorkflowThink = true;
                 await writer.write(encoder.encode("<think>\n🔍 Initializing deep research pipeline…\n"));
@@ -234,7 +235,7 @@ export async function POST(req: NextRequest) {
                             await writer.write(encoder.encode("</think>\n\n"));
                         }
                         // Workflow returned nothing useful — fall back to agent
-                        await streamAgent(agent, fullMessage, threadId, userEmail, userTimezone, writer, encoder);
+                        await streamAgent(agent, fullMessage, threadId, userEmail, userTimezone, userName, writer, encoder);
                     }
                 } catch (workflowErr) {
                     console.error("Research workflow error, falling back to agent:", workflowErr);
@@ -245,11 +246,11 @@ export async function POST(req: NextRequest) {
                     await writer.write(
                         encoder.encode("*Research pipeline hit an issue — switching to direct agent mode.*\n\n")
                     );
-                    await streamAgent(agent, fullMessage, threadId, userEmail, userTimezone, writer, encoder);
+                    await streamAgent(agent, fullMessage, threadId, userEmail, userTimezone, userName, writer, encoder);
                 }
             } else {
                 // ── Standard agent mode ──
-                await streamAgent(agent, fullMessage, threadId, userEmail, userTimezone, writer, encoder);
+                await streamAgent(agent, fullMessage, threadId, userEmail, userTimezone, userName, writer, encoder);
             }
 
         } catch (err: unknown) {
@@ -293,6 +294,7 @@ async function streamAgent(
     threadId: string | undefined,
     resourceId: string,
     timezone: string,
+    userName: string | undefined,
     writer: WritableStreamDefaultWriter,
     encoder: TextEncoder
 ) {
@@ -303,6 +305,9 @@ async function streamAgent(
 
         const reqContext = new RequestContext();
         reqContext.set("timezone", timezone);
+        if (userName) {
+            reqContext.set("userName", userName);
+        }
 
         const response = await agent.stream(message, {
             maxSteps: 5,
@@ -392,7 +397,7 @@ async function streamAgent(
             await writer.write(
                 encoder.encode(
                     `**LLM Provider Error:** ${msg}\n\n` +
-                    "You can switch the model by setting `OPENROUTER_MODEL` in your `.env.local` (e.g. `OPENROUTER_MODEL=deepseek/deepseek-chat`)."
+                    "You can switch the model by setting `OPENROUTER_MODEL` in your `.env.local` (e.g. `OPENROUTER_MODEL=openai/gpt-4o-mini` or `openai/gpt-4o`)."
                 )
             ).catch(() => {});
         } else {

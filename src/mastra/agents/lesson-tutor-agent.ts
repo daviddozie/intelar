@@ -21,5 +21,5 @@ export const lessonTutorAgent = new Agent({
     id: "lesson_tutor_agent",
     name: "Lesson-Tutor",
     instructions: LESSON_TUTOR_BASE_INSTRUCTIONS,
-    model: openrouter(process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat"),
+    model: openrouter(process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini"),
 });
