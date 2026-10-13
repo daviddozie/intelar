@@ -94,7 +94,7 @@ export default function ChatWindow({ messages, isLoading, theme, onPreviewFile }
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="h-full overflow-y-auto transition-colors duration-300"
+        className="h-full overflow-y-auto overflow-x-hidden transition-colors duration-300"
       >
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
           {messages.map((message) => (

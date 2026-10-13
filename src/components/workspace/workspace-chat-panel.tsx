@@ -3,7 +3,7 @@
 import { TooltipButton } from "@/components/ui/tooltip-button";
 import { Fragment, useEffect, useMemo, type Dispatch, type FormEvent, type RefObject, type SetStateAction } from "react";
 import Image from "next/image";
-import { AtSign, Bot, Check, CircleAlert, Clock3, FileText, Mail, MessageSquareReply, MessageSquareText, Plus, Send, SmilePlus, UsersRound, X } from "lucide-react";
+import { AtSign, Check, CircleAlert, Clock3, FileText, Mail, MessageSquareReply, MessageSquareText, Plus, Send, SmilePlus, UsersRound, X } from "lucide-react";
 import MessageBubble from "@/components/message-bubble";
 import { WorkspaceEmojiPicker } from "@/components/workspace/workspace-emoji-picker";
 import { QUICK_WORKSPACE_REACTIONS } from "@/components/workspace/workspace-emoji-data";
@@ -55,7 +55,17 @@ type WorkspaceChatPanelProps = {
 };
 
 function MemberAvatar({ name, src, assistant = false }: { name: string; src?: string | null; assistant?: boolean }) {
-  return <span className="relative grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full border border-border/70 bg-muted text-[11px] font-semibold text-muted-foreground">{assistant ? <Bot className="h-4 w-4" /> : src ? <Image src={src} alt={`${name}'s profile`} fill sizes="32px" unoptimized className="object-cover" /> : name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "?"}</span>;
+  return (
+    <span className="relative grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full border border-border/70 bg-muted text-[11px] font-semibold text-muted-foreground">
+      {assistant ? (
+        <Image src="/lesson-tutor-icon.png" alt={name} width={24} height={24} className="h-6 w-6 object-contain" />
+      ) : src ? (
+        <Image src={src} alt={`${name}'s profile`} fill sizes="32px" unoptimized className="object-cover" />
+      ) : (
+        name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "?"
+      )}
+    </span>
+  );
 }
 
 function WorkspaceFilePreviewChip({
@@ -144,7 +154,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
   const isDark = theme === "dark";
   return (
           <section className="flex min-h-0 flex-1 flex-col">
-            <div ref={messageListRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto py-4 pr-1">
+            <div ref={messageListRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto overflow-x-hidden py-4 pr-1">
               {!workspaceMessages.length && (messagesLoading ?? !socketReady) ? (
                 <div className="space-y-4">
                   {[1, 2, 3].map((i) => (
@@ -175,7 +185,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                     return (
                       <Fragment key={m.id}>
                         {showDateDivider && <WorkspaceDateDivider date={sentAt} />}
-                        <article tabIndex={0} className={`group/message relative -mx-2 max-w-full rounded-2xl p-2 transition-colors hover:bg-muted/25 focus-within:bg-muted/25 focus-visible:outline-none ${isMentionForMe ? "bg-sky-500/5" : ""}`}>
+                        <article tabIndex={0} className={`group/message relative max-w-full rounded-2xl p-2 transition-colors hover:bg-muted/25 focus-within:bg-muted/25 focus-visible:outline-none ${isMentionForMe ? "bg-sky-500/5" : ""}`}>
                           {!m.isStreaming && <div className="absolute right-3 top-1 z-20 flex items-center gap-0.5 rounded-xl border border-border/80 bg-popover p-1 text-popover-foreground opacity-100 shadow-md transition-opacity sm:top-2 sm:opacity-0 sm:group-hover/message:opacity-100 sm:group-focus-within/message:opacity-100">
                             {QUICK_WORKSPACE_REACTIONS.map((emoji) => {
                               const isReacted = (m.reactions ?? []).some((r) => r.emoji === emoji && r.reacted);
@@ -213,7 +223,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                   return (
                     <Fragment key={m.clientMessageId ?? m.id}>
                       {showDateDivider && <WorkspaceDateDivider date={sentAt} />}
-                      <article tabIndex={0} className={`group/message relative -mx-2 flex items-end gap-2.5 rounded-xl p-2 transition-colors hover:bg-muted/25 focus-within:bg-muted/25 focus-visible:outline-none ${isOwn ? "justify-end" : "justify-start"} ${isMentionForMe ? "bg-sky-500/5" : ""}`}>
+                      <article tabIndex={0} className={`group/message relative flex items-end gap-2.5 rounded-xl p-2 transition-colors hover:bg-muted/25 focus-within:bg-muted/25 focus-visible:outline-none ${isOwn ? "justify-end" : "justify-start"} ${isMentionForMe ? "bg-sky-500/5" : ""}`}>
                         {m.deliveryStatus !== "sending" && m.deliveryStatus !== "failed" && <div className={`absolute top-0 z-20 flex items-center gap-0.5 rounded-xl border border-border/80 bg-popover p-1 text-popover-foreground opacity-100 shadow-md transition-opacity sm:top-1 sm:opacity-0 sm:group-hover/message:opacity-100 sm:group-focus-within/message:opacity-100 ${isOwn ? "right-14" : "left-14"}`}>
                           {QUICK_WORKSPACE_REACTIONS.map((emoji) => {
                             const isReacted = (m.reactions ?? []).some((r) => r.emoji === emoji && r.reacted);
@@ -314,7 +324,7 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                   <p className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Mention someone or something</p>
                   {filteredMentionOptions.map((option, index) => {
                     const active = index === activeMentionIndex;
-                    const Icon = option.kind === "assistant" ? Bot : option.kind === "member" ? UsersRound : option.kind === "resource" ? FileText : Mail;
+                    const Icon = option.kind === "member" ? UsersRound : option.kind === "resource" ? FileText : Mail;
                     return (
                       <button
                         key={`${option.kind}:${option.label}:${index}`}
@@ -325,7 +335,13 @@ export function WorkspaceChatPanel(props: WorkspaceChatPanelProps) {
                         onClick={() => selectMention(option)}
                         className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left ${active ? "bg-accent text-accent-foreground" : "hover:bg-accent/60"}`}
                       >
-                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-muted"><Icon className="h-4 w-4" /></span>
+                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-muted overflow-hidden">
+                          {option.kind === "assistant" ? (
+                            <Image src="/lesson-tutor-icon.png" alt="Intelar" width={20} height={20} className="h-5 w-5 object-contain" />
+                          ) : (
+                            <Icon className="h-4 w-4" />
+                          )}
+                        </span>
                         <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{option.label}</span><span className="block truncate text-[11px] text-muted-foreground">{option.detail}</span></span>
                         <span className="text-xs font-semibold text-sky-500">{option.kind === "invite" ? "↗" : `@${option.label}`}</span>
                       </button>

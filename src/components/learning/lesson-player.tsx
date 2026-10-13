@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Image from "next/image";
 import type { LearningLesson, LearningSourceReference } from "@/lib/learning-types";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import PracticeQuestionCard from "./practice-question-card";
 import SourceReferenceModal from "./source-reference-modal";
 import LessonTutorDrawer from "./lesson-tutor-drawer";
-import { ArrowLeft, ArrowRight, Bot, Check, BookOpen, Sparkles, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, BookOpen, Sparkles, Lock } from "lucide-react";
 
 interface LessonPlayerProps {
     lesson: LearningLesson;
@@ -106,7 +107,13 @@ export default function LessonPlayer({
                                 : "border border-border bg-card hover:bg-muted text-foreground"
                         }`}
                     >
-                        <Bot className="w-3.5 h-3.5" />
+                        <Image
+                            src="/lesson-tutor-icon.png"
+                            alt=""
+                            width={20}
+                            height={20}
+                            className="w-5 h-5 shrink-0"
+                        />
                         <span>Lesson tutor</span>
                     </button>
 

@@ -20,7 +20,6 @@ import {
   LoaderCircle,
   Copy,
   Check,
-  Bot,
 } from "lucide-react";
 
 import type { MentionOption, Message, MessageReaction, ReplyReference, Workspace, WorkspaceMember, WorkspaceTab, WorkspaceTheme } from "@/components/workspace/workspace-types";
@@ -43,7 +42,7 @@ function MemberAvatar({
   return (
     <span className="relative grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full border border-border/70 bg-muted text-[11px] font-semibold text-muted-foreground">
       {assistant ? (
-        <Bot className="h-4 w-4" />
+        <Image src="/lesson-tutor-icon.png" alt={name} width={24} height={24} className="h-6 w-6 object-contain" />
       ) : src ? (
         <Image src={src} alt={`${name}'s profile`} fill sizes="32px" unoptimized className="object-cover" />
       ) : (
