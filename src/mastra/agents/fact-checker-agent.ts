@@ -70,6 +70,6 @@ export const factCheckerAgent = new Agent({
         }
         return buildFactCheckerInstructions(getSystemTemporalContext(tz));
     },
-    model: openrouter(process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat"),
+    model: openrouter(process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini"),
     tools: { webSearchTool, webFetchTool },
 });

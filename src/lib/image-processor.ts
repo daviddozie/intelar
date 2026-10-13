@@ -36,7 +36,7 @@ export async function processImage(buffer: Buffer, mimeType: string): Promise<Pr
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                model: process.env.OPENROUTER_VISION_MODEL || "google/gemini-2.5-flash",
+                model: process.env.OPENROUTER_VISION_MODEL || "openai/gpt-4o-mini",
                 stream: false,
                 messages: [{
                     role: "user",

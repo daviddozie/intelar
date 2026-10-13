@@ -33,5 +33,5 @@ export const examAgent = new Agent({
     id: "exam-agent",
     name: "Exam-Agent",
     instructions: EXAM_AGENT_BASE_INSTRUCTIONS,
-    model: openrouter(process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat"),
+    model: openrouter(process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini"),
 });

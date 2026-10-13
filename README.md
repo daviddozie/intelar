@@ -66,7 +66,7 @@ deployment checks, and `npm run check:seo`.
 |---|---|
 | **Framework** | [Next.js 16](https://nextjs.org) (App Router, Turbopack) |
 | **AI orchestration** | [Mastra](https://mastra.ai) + `@mastra/core` |
-| **LLM** | [OpenRouter](https://openrouter.ai) — `deepseek/deepseek-chat` by default (configurable via `OPENROUTER_MODEL`) |
+| **LLM** | [OpenRouter](https://openrouter.ai) — `openai/gpt-4o-mini` by default (configurable via `OPENROUTER_MODEL`, e.g. `openai/gpt-4o`) |
 | **Embeddings** | HuggingFace `sentence-transformers/all-MiniLM-L6-v2` |
 | **Vector DB** | [Pinecone](https://pinecone.io) |
 | **Database** | [Turso](https://turso.tech) (LibSQL) — conversations + research sessions |
@@ -236,12 +236,13 @@ Documents are semantically chunked (paragraph → sentence boundaries) and store
 
 ---
 
-## 🔑 Rate Limits (Free Tier)
+## 🔑 Rate Limits & Model Configuration
 
-The default model is `deepseek/deepseek-chat` (or customize via `OPENROUTER_MODEL` in `.env.local`).
+The default model is `openai/gpt-4o-mini` (or customize via `OPENROUTER_MODEL` in `.env.local`, e.g. `openai/gpt-4o`).
 
 To configure your model or limits:
-- Set `OPENROUTER_MODEL` in `.env.local` to any slug from [openrouter.ai/models](https://openrouter.ai/models) (e.g. `deepseek/deepseek-chat`, `nvidia/nemotron-3.5-lightning:free`, etc.)
+- Set `OPENROUTER_MODEL` in `.env.local` to any slug from [openrouter.ai/models](https://openrouter.ai/models) (e.g. `openai/gpt-4o-mini`, `openai/gpt-4o`, etc.)
+- Set `OPENROUTER_VISION_MODEL` in `.env.local` to specify the multimodal model used for image OCR and search indexing (defaults to `openai/gpt-4o-mini`, or `openai/gpt-4o`).
 - Add credits on OpenRouter if using paid models or to unlock higher throughput.
 
 ---

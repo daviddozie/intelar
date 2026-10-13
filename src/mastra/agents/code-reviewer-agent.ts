@@ -48,5 +48,5 @@ export const codeReviewerAgent = new Agent({
     id: "code_reviewer_agent",
     name: "Code-Reviewer",
     instructions: CODE_REVIEWER_INSTRUCTIONS,
-    model: openrouter(process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat"),
+    model: openrouter(process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini"),
 });

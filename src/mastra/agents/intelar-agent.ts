@@ -39,16 +39,18 @@ export const intelarAgent = new Agent({
     name: "Intelar",
     instructions: ({ requestContext }) => {
         let tz: string | undefined;
+        let userName: string | undefined;
         try {
             if (requestContext && typeof requestContext.get === "function") {
                 tz = (requestContext.get("timezone") || requestContext.get("userTimezone")) as string | undefined;
+                userName = requestContext.get("userName") as string | undefined;
             }
         } catch {
             // fallback to default
         }
-        return buildIntelarInstructions(getSystemTemporalContext(tz));
+        return buildIntelarInstructions(getSystemTemporalContext(tz), userName);
     },
-    model: openrouter(process.env.OPENROUTER_MODEL || "deepseek/deepseek-chat"),
+    model: openrouter(process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini"),
     tools: {
         webSearchTool,
         webFetchTool,
