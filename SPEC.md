@@ -77,6 +77,23 @@ Facilitator authoring, cohort management, assignment grading,
 notifications, full multilingual support, downloadable audio,
 certification, and live opportunity listings.
 
+## Exam revision extension
+From a saved exam result, a learner can create a revision path covering
+missed and unanswered questions from that exact attempt. Reuse the exam's
+questions and AI-prepared explanations; verify complete supporting excerpts
+against the owner's original resources before saving any path.
+
+Revision paths contain one to five lessons, with a variable number of
+practice questions per lesson so a single mistake does not require filler.
+The original three-to-five-lesson, three-question format remains applicable
+to general study-path generation. All missed questions are included, grouped
+in exam order; this release does not claim topic diagnosis or new assessment.
+
+Use existing Learn progress, tutoring, and download controls. Preparation
+requires connectivity; the saved lessons and practice can be downloaded.
+Repeated requests for the same attempt reopen the same path without
+resetting progress. Unverifiable excerpts must produce a useful error.
+
 ## Definition of done
 A learner can select resources, study a cited lesson, practise,
 disconnect, continue offline, reconnect, and resume with correct

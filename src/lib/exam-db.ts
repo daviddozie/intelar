@@ -302,3 +302,13 @@ export async function getLatestExamAttempt(
     if (result.rows.length === 0) return null;
     return attemptFromRow(result.rows[0]);
 }
+
+export async function getExamAttempt(userEmail: string, examId: string, attemptId: string): Promise<ExamAttempt> {
+    await initExamDB();
+    const result = await getDB().execute({
+        sql: "SELECT * FROM exam_attempts WHERE id = ? AND exam_id = ? AND user_email = ? LIMIT 1",
+        args: [attemptId, examId, userEmail],
+    });
+    if (!result.rows[0]) throw new ExamNotFoundError("Exam attempt not found");
+    return attemptFromRow(result.rows[0]);
+}

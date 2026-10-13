@@ -16,7 +16,23 @@ export function getDB() {
     return _turso;
 }
 
-export async function initDB() {
+let initialization: Promise<void> | null = null;
+
+export function initDB(): Promise<void> {
+    if (!initialization) {
+        initialization = initializeDB().catch((error) => {
+            initialization = null;
+            throw error;
+        });
+    }
+    return initialization;
+}
+
+function isDuplicateColumnError(error: unknown): boolean {
+    return error instanceof Error && /duplicate column name:/i.test(error.message);
+}
+
+async function initializeDB() {
     const db = getDB();
     await db.execute(`
     CREATE TABLE IF NOT EXISTS conversations (
@@ -58,21 +74,21 @@ export async function initDB() {
   `);
     try {
         await db.execute(`ALTER TABLE resources ADD COLUMN favorite INTEGER NOT NULL DEFAULT 0`);
-    } catch {
-        // Column already exists — ignore
+    } catch (error) {
+        if (!isDuplicateColumnError(error)) throw error;
     }
     for (const column of ["folder TEXT", "conversation_id TEXT", "storage TEXT", "public_id TEXT", "resource_type TEXT", "vector_file_name TEXT", "deleted INTEGER NOT NULL DEFAULT 0"]) {
         try {
             await db.execute(`ALTER TABLE resources ADD COLUMN ${column}`);
-        } catch {
-            // Column already exists — ignore
+        } catch (error) {
+            if (!isDuplicateColumnError(error)) throw error;
         }
     }
     // Migrate existing tables that don't yet have the pinned column
     try {
         await db.execute(`ALTER TABLE conversations ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0`);
-    } catch {
-        // Column already exists — ignore
+    } catch (error) {
+        if (!isDuplicateColumnError(error)) throw error;
     }
     await db.execute(`
     CREATE TABLE IF NOT EXISTS shared_conversations (
@@ -86,11 +102,7 @@ export async function initDB() {
       view_count INTEGER NOT NULL DEFAULT 0
     )
   `);
-    try {
-        await db.execute(`CREATE INDEX IF NOT EXISTS idx_shared_conversations_conv_id ON shared_conversations(conversation_id)`);
-    } catch {
-        // Index exists or not supported
-    }
+    await db.execute(`CREATE INDEX IF NOT EXISTS idx_shared_conversations_conv_id ON shared_conversations(conversation_id)`);
 }
 
 export async function getUserResourceFolders(userEmail: string): Promise<string[]> {

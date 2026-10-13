@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSharedConversationSnapshot } from "@/lib/db";
 import SharedChatViewer from "@/components/shared-chat-viewer";
+import { SITE_URL } from "@/lib/seo";
 
 interface SharePageProps {
   params: Promise<{ shareId: string }>;
@@ -29,7 +30,7 @@ export async function generateMetadata({
         title: `${snapshot.title} — Intelar`,
         description: snippet,
         type: "article",
-        url: `https://intelar.vercel.app/share/${shareId}`,
+        url: `${SITE_URL}/share/${shareId}`,
       },
       twitter: {
         card: "summary_large_image",

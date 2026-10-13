@@ -72,6 +72,23 @@ limitations are documented honestly.
 Acceptance:
 A learner uploads a course document/manual, configures difficulty (easy/medium/hard/standard), question count (10/20/30/50), and time limit. An authentic exam is generated and played under a countdown timer. Answers are graded, persisted, and reviewed with document-grounded explanations.
 
+## Milestone 7: Connect exam feedback to revision
+- Add a results action for missed and unanswered questions.
+- Read the exact saved attempt and exam using the authenticated owner.
+- Verify source excerpts against authorized original documents.
+- Save one ready revision path atomically; repeated requests reuse it.
+- Open the path in Learn and reuse progress and offline study-pack behavior.
+- Keep revision lessons focused on saved questions; support one to five
+  lessons without changing general study-path generation requirements.
+
+Acceptance:
+Correct answers are excluded and all missed/unanswered questions are covered.
+One mistake can produce one lesson. Repeated/concurrent requests reuse the
+same path and preserve progress. Foreign exams, mismatched attempts, and
+unauthorized resources are rejected. Citation failure saves no partial path.
+Saved revision content fits the existing offline pack format. The results
+action has focused loading and useful error feedback, then opens Learn.
+
 ## Verification policy
 - Run focused checks for authorization, persistence, generation
   validation, and offline synchronization.
