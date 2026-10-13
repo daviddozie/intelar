@@ -12,6 +12,7 @@ import {
     HelpCircle,
 } from "lucide-react";
 import type { ExamAttempt, ExamPrep } from "@/lib/exam-types";
+import ExamRevisionCard from "./exam-revision-card";
 
 interface ExamResultsViewProps {
     exam: ExamPrep;
@@ -196,6 +197,8 @@ export default function ExamResultsView({
                     </div>
                 </div>
             </div>
+
+            <ExamRevisionCard key={attempt.id} examId={exam.id} attemptId={attempt.id} missedCount={incorrectQuestions.length} />
 
             {/* Question Review Section */}
             <div className="space-y-4">

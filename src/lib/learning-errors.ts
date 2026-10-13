@@ -23,7 +23,20 @@ export class OutlineStructureError extends Error {
     }
 }
 
+export class LearningSourceUnavailableError extends Error {
+    constructor(cause: unknown) {
+        super("Could not retrieve your original study materials. Check your connection and try again shortly.", { cause });
+        this.name = "LearningSourceUnavailableError";
+    }
+}
+
 export function learningErrorResponse(error: unknown): Response {
+    if (error instanceof LearningSourceUnavailableError) {
+        return Response.json({ error: error.message }, {
+            status: 503,
+            headers: { "Retry-After": "5", "Cache-Control": "no-store" },
+        });
+    }
     if (error instanceof LearningNotFoundError) {
         return Response.json({ error: "Learning path or resource not found" }, { status: 404 });
     }

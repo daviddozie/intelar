@@ -19,7 +19,9 @@
     "check:offline": "node --import tsx --test scripts/test-offline-sync.test.ts",
     "check:demo": "node --import tsx --test scripts/test-demonstration-journey.test.ts",
     "check:mcp": "node --import tsx --test scripts/test-mcp-ingest.test.ts",
-    "check:exam": "node --import tsx --test scripts/test-exam-prep.test.ts"
+    "check:exam": "node --import tsx --test scripts/test-exam-prep.test.ts",
+    "check:revision": "node --import tsx --test scripts/test-exam-revision.test.ts",
+    "check:seo": "node --import tsx scripts/check-seo.ts"
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.15",

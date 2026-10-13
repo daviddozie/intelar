@@ -1,6 +1,17 @@
 import type { NextConfig } from "next";
+import { APP_PATHS, IS_PREVIEW } from "./src/lib/seo";
 
 const nextConfig: NextConfig = {
+    async headers() {
+        return [
+            ...APP_PATHS.map((path) => ({
+                source: `/${path}/:path*`,
+                headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+            })),
+            { source: "/api/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+            ...(IS_PREVIEW ? [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }] : []),
+        ];
+    },
     serverExternalPackages: ["pdf-parse"],
 
     experimental: {

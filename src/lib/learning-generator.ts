@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { getUserResourceForChat } from "./db";
 import { getLearningPath, updateLearningPathLessons, LearningNotFoundError } from "./learning-db";
-import { InsufficientMaterialError, InvalidSourceReferenceError, OutlineStructureError } from "./learning-errors";
+import { InsufficientMaterialError, InvalidSourceReferenceError, OutlineStructureError, LearningSourceUnavailableError } from "./learning-errors";
 import { getOrProcessResourceDocument, selectReferenceContext } from "./document-processor";
 import type {
     LearningLesson,
@@ -34,11 +34,16 @@ export async function extractResourceTexts(
             throw new LearningNotFoundError();
         }
 
-        const processed = await getOrProcessResourceDocument(
-            resource.url,
-            resource.fileName,
-            resource.type
-        );
+        let processed;
+        try {
+            processed = await getOrProcessResourceDocument(
+                resource.url,
+                resource.fileName,
+                resource.type
+            );
+        } catch (error) {
+            throw new LearningSourceUnavailableError(error);
+        }
 
         docs.push({
             url: resource.url,

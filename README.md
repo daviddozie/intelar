@@ -40,6 +40,23 @@ Intelar is an AI-powered research assistant you can chat with. Unlike a standard
 | **Conversation history** | Stored in Turso (LibSQL), synced per user |
 | **Image attachments** | Upload images via Cloudinary, passed to the agent |
 | **Auth** | Google and GitHub OAuth via NextAuth |
+| **Exam revision** | Create a Learn path from missed/unanswered exam questions, with verified source passages, explanations, untimed retries, and downloadable study packs |
+
+On a saved exam's results screen, select **Help me revise** to open the
+revision in Learn. Preparation requires internet access to check the
+original documents. Download the path from Learn's dashboard for offline
+study. The plan reuses AI-prepared exam explanations and questions; it
+does not independently verify the answers or infer mastery by topic.
+Missing/unverifiable source excerpts prevent creation. Repeated requests
+for the same attempt reopen the existing plan and preserve progress.
+
+Run `npm run check:revision` for the revision service and HTTP-boundary tests.
+
+Public search discovery uses `/robots.txt`, `/sitemap.xml`, pre-rendered
+`/features` pages, per-page metadata, structured data, and `/og-image.png`.
+Personal app pages are marked noindex. See [docs/SEO.md](docs/SEO.md) for
+canonical domain configuration, crawler policies, Google/Bing verification,
+deployment checks, and `npm run check:seo`.
 
 ---
 

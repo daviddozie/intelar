@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { ArrowDown, ArrowUpRight, ArrowRight, BookOpen, Check, FileText, Globe2, GraduationCap, Layers3, Pause, Play, Search, UsersRound, Sun, Moon, Download, ClipboardCheck, FolderOpen } from "lucide-react";
 import IntelarLogo from "@/components/svg";
 import { useChat } from "@/context/chat-context";
@@ -38,18 +38,19 @@ const examples = [
 
 const questions = [
   ["What can I do with Intelar?", "Research topics with web sources, ask questions about documents, create study paths, practise what you learn, prepare for exams, and collaborate in shared workspaces."],
-  ["Do I need an account to try it?", "You can try research chat and explore the sample learning course without signing in. An account is needed for saved conversations, private study paths, and shared workspaces."],
+  ["Do I need an account to try it?", "You can try research chat without signing in. An account is needed for saved conversations, personal study paths, exam preparation, and shared workspaces."],
   ["Can I bring my own materials?", "Yes. Add supported documents to your resources and use them as context for research or a personal study path. Upload only materials you’re authorized to use."],
   ["Does it work offline?", "Downloaded lessons and practice can be used offline. Live research, AI tutoring, and workspace collaboration need an internet connection."],
   ["How should I use AI-generated answers?", "Use the linked sources to check important claims. AI can make mistakes, so review answers and learning materials alongside the original sources."],
 ];
 
+function subscribeToMount() { return () => {}; }
+
 export default function LandingPage() {
   const { theme, toggleTheme } = useChat();
   const [activeExample, setActiveExample] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(subscribeToMount, () => true, () => false);
   const example = examples[activeExample];
 
   return (
@@ -158,7 +159,7 @@ export default function LandingPage() {
             <article><FolderOpen size={24} /><h3>A library for your research.</h3><p>Keep supported PDFs, Word documents, CSV files, and text resources together. Attach a resource to a chat to ask questions about the material you’re working with.</p><Link href="/resources">Explore resources <ArrowUpRight size={15} /></Link></article>
             <article><GraduationCap size={24} /><h3>A path through your materials.</h3><p>Create a personal study path from selected resources. Review the outline, work through short lessons with source references, and practise with hints and explanations.</p><Link href="/learn">Explore learning <ArrowUpRight size={15} /></Link></article>
             <article><ClipboardCheck size={24} /><h3>Practice with a purpose.</h3><p>Prepare for exams using your study materials. Work through practice questions, review your results, and return to the topics that need more attention.</p><Link href="/exam-prep">Explore exam prep <ArrowUpRight size={15} /></Link></article>
-            <article><Download size={24} /><h3>Keep learning offline.</h3><p>Download lessons and practice for later. Continue through a connection interruption, then synchronize your progress when you reconnect. Live AI research and tutoring still need the internet.</p><Link href="/learn">Start with a sample course <ArrowUpRight size={15} /></Link></article>
+            <article><Download size={24} /><h3>Keep learning offline.</h3><p>Download lessons and practice for later. Continue through a connection interruption, then synchronize your progress when you reconnect. Live AI research and tutoring still need the internet.</p><Link href="/features/personal-learning">Explore offline study <ArrowUpRight size={15} /></Link></article>
           </div>
           <div className={styles.workspaceStrip}><div className={styles.workspacePeople} aria-hidden="true"><span>A</span><span>B</span><span>You</span></div><div><h3>Your group’s work, in one workspace.</h3><p>Invite peers, share resources, and discuss ideas with shared context. Sign in to create or join a workspace.</p></div><Link href="/workspaces">Think together <ArrowUpRight size={16} /></Link></div>
         </section>
@@ -183,9 +184,9 @@ export default function LandingPage() {
       </main>
       <footer className={styles.footer}>
         <div className={styles.footerIntro}><Link href="/" className={styles.brand}><IntelarLogo size={28} /><span>Intelar</span></Link><p>A space for research,<br />learning, and shared ideas.</p></div>
-        <div><h3>Product</h3><Link href="/chat">Research chat</Link><Link href="/resources">Resources</Link><Link href="/workspaces">Workspaces</Link></div>
-        <div><h3>Learning</h3><Link href="/learn">Study paths</Link><Link href="/exam-prep">Exam preparation</Link><Link href="/learn">Offline study</Link></div>
-        <div><h3>Explore</h3><a href="#how-it-works">How it works</a><a href="#questions">Common questions</a><Link href="/login?callbackUrl=%2Fchat">Log in</Link></div>
+        <div><h3>Product</h3><Link href="/features/ai-research">Research chat</Link><Link href="/resources">Resources</Link><Link href="/features/collaborative-workspaces">Workspaces</Link></div>
+        <div><h3>Learning</h3><Link href="/features/personal-learning">Study paths</Link><Link href="/features/exam-preparation">Exam preparation</Link><Link href="/features/personal-learning">Offline study</Link></div>
+        <div><h3>Explore</h3><Link href="/features">All features</Link><a href="#how-it-works">How it works</a><a href="#questions">Common questions</a><Link href="/login?callbackUrl=%2Fchat">Log in</Link></div>
         <div className={styles.footerBottom}><p>Intelar. Follow the question.</p><span>AI answers are a starting point. Always check the sources.</span></div>
       </footer>
     </div>

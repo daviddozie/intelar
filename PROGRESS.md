@@ -1,6 +1,15 @@
 # Intelar Learning Progress
 
 ## Current status
+Exam-to-Learn revision implementation added on 2026-10-13. Service and HTTP
+acceptance checks pass; signed-in browser navigation and offline reload for
+the new revision journey remain unverified. Historical milestone results
+below are retained as previously recorded.
+
+Follow-up: the reported 5/30 exam now has a ready revision saved in the live
+database, covering all 25 missed questions in five lessons. Live service
+creation and reopening passed after removing repeated base DB initialization.
+
 Milestone 6 complete. Exam Prep simulation feature implemented, verified, and protected against regressions. Learners can upload or select course manuals/textbooks (e.g. Physics, Software Engineering) and generate authentic timed examination simulations with 10, 20, 30, up to 50 questions across Easy, Medium, Hard, and Standard difficulty levels. Includes interactive countdown timer with auto-submit, question palette navigation (1..N), keyboard shortcuts (A-D, 1-4), flagged review, academic performance classification (Distinction, Credit, Pass, Revision Needed), and document-grounded question review with explanations.
 
 ## Completed preparation
@@ -19,6 +28,7 @@ Milestone 6 complete. Exam Prep simulation feature implemented, verified, and pr
 - [x] Offline study and synchronization.
 - [x] Accessibility, student trials, and submission evidence.
 - [x] Exam Prep simulation feature (Milestone 6).
+- [ ] Exam-to-Learn revision (Milestone 7): implementation and automated checks complete; signed-in browser walkthrough pending.
 
 ## Known issues from inspection
 - Turso connection timeouts were reported; handled gracefully with sanitized 503 Retry-After responses and validated via `check:database`.
@@ -229,3 +239,140 @@ Ready for user feedback and pilot trials on course manuals with calculation and 
 - Verification: production build passed with network access for configured Google fonts; the initial sandbox build failed fetching those fonts. Full `npm run lint` reports the existing 7 errors and 35 warnings outside the settings implementation.
 - Browser observations: guest theme and motion changes persisted after reload; System resolved to the current device theme; Escape restored trigger focus; closing preserved a chat draft; the mobile dialog measured 360px wide with no horizontal overflow and displayed its section selector. Account and storage sections were inspected. Screenshot: `/private/tmp/intelar-settings.png`.
 - Limitations: real signed-in cross-device browser sync, OS preference changes, live streaming preservation, and a running exam timer were not exercised in this guest preview. No learning persistence or synchronization behavior was changed.
+
+## Exam-to-Learn Revision — First Release (2026-10-13)
+
+- Added **Help me revise** on results with missed/unanswered questions,
+  focused loading, accessible status/error feedback, and navigation to the
+  first revision lesson in Learn. Perfect scores have no revision action.
+- Added authenticated POST `/api/exams/[id]/revision`. It accepts only a saved
+  attempt ID, loads the exact owner-scoped exam/attempt, and rechecks resource
+  ownership before reading the original documents.
+- Reuses saved exam questions and AI-prepared explanations. Every complete
+  source excerpt must match an authorized document after whitespace/case
+  normalization; citation metadata names the matched document and does not
+  invent licensing rights. Missing/unverifiable excerpts return 422.
+- Groups every missed/unanswered question in exam order into one to five
+  lessons, with no filler questions. Documented this revision-only exception
+  to the general study-path format in SPEC.md and PLAN.md.
+- Persists a ready path in one insert after all validation. A stable ID per
+  owner/exam/attempt prevents duplicate paths during concurrent requests and
+  preserves progress when reopened. No schema changes or dependencies added.
+- Revision paths use existing Learn practice, progress, tutoring, download,
+  and offline-pack behavior. Creation/reopening requires connectivity.
+- Actual checks: `npm run check:revision` passed (6/6); `npm run check:exam`
+  passed (8/8); `npm run check:paths` passed (10/10); `npm run check:offline`
+  passed (9/9). Tests use in-memory LibSQL and non-sensitive local document
+  fixtures. HTTP tests stub authentication, with real revision/persistence
+  code. Coverage includes exact attempt ownership, resource ownership,
+  citations mapped to the correct document, atomic validation failures,
+  concurrent retries, one/50 misses, progress persistence, and pack contents.
+- Actual checks: `npx tsc --noEmit --incremental false` and focused ESLint on
+  all changed source/test files passed. `git diff --check` passed.
+- Full `npm run lint` reports 11 errors and 36 warnings in unchanged files
+  (including chat, login, exam generator, and older scripts); focused revision
+  files have no lint errors or warnings.
+- Production build passed with network access for configured Google Fonts.
+  Initial restricted build failed downloading Geist and Geist Mono.
+- Limitations: no signed-in browser walkthrough, mobile visual check, real
+  database/provider exercise, or revision-specific airplane-mode reload was
+  performed. Pack-content compatibility is tested, rather than a claim of
+  end-to-end browser offline verification. Source verification does not
+  independently establish correctness of saved AI-prepared explanations.
+- Deferred: fresh practice generation, topic diagnosis, spaced review,
+  scheduling, and practical-project integration.
+- Next action: use an owned exam with source excerpts to exercise results →
+  Help me revise → Learn → practice → reload → download → offline reload in
+  a signed-in browser, and record observed outcomes before marking the
+  Milestone 7 browser acceptance complete.
+
+### Revision 503 investigation and repair (2026-10-13)
+
+- User reported a retryable 503 from the revision endpoint after a successful
+  exam submission. Read-only live checks found the exam, attempt, owned
+  resource, and learning table; all 25 missed questions had verified excerpts.
+  The original failed request's precise operation was not logged, so its
+  exact failing network call cannot be established retrospectively.
+- Found `getUserResourceForChat` rerunning base table setup and nine column
+  migrations on every ownership lookup. Cached successful `initDB` completion
+  and shared pending initialization between concurrent calls. Initialization
+  failures reset the promise so a later request can retry.
+- Migration catches now ignore only duplicate-column errors. Network and
+  other migration failures are surfaced; index initialization errors are
+  no longer silently ignored. Existing data and additive migrations are
+  retained; no schema additions were made.
+- Wrapped original document download/parse errors with a distinct retryable
+  study-materials error so they are not mislabeled as saved-data outages.
+- Live verification used the reported exam and latest matching 5/30 attempt:
+  saved a ready revision with five lessons and 25 questions in 5,134 ms;
+  reopened the same path in 554 ms. This saved the revision originally
+  requested by the learner. No exam answers or existing progress were changed.
+- Checks: `npm run check:database` passed against live Turso; three isolated
+  initialization tests passed for concurrency, no repeated DDL on ownership
+  reads, retry after migration timeout, and legacy-data preservation.
+- Checks: revision tests passed (7/7, including sanitized source-retrieval
+  errors); foundation tests passed (13/13); personal-path tests passed (10/10).
+  Exam tests passed (8/8) and offline tests passed (9/9), for 50 tests total
+  including the three initialization tests.
+  TypeScript, focused ESLint, production build (with Google Fonts network
+  access), and diff checks passed.
+- Remaining verification: signed-in results-button navigation, mobile layout,
+  and actual offline reload. The live check called the service directly and
+  does not establish end-to-end browser behavior or eliminate possible
+  future provider/network outages.
+
+## Public SEO and AI Search Discovery (2026-10-13)
+
+- Confirmed the official canonical origin with the user:
+  `https://intelar.vercel.app`. Added central metadata/canonical configuration
+  and optional Google Search Console/Bing verification environment variables.
+- Added generated robots and sitemap endpoints. Sitemap includes only the
+  homepage, feature directory, and four public feature pages. No fabricated
+  last-modified dates or private learner records are included.
+- Added pre-rendered public feature content for research, personal learning,
+  exam preparation/revision, and collaborative workspaces. Linked these from
+  the homepage footer and from the public feature navigation. Corrected the
+  stale homepage claim that an unauthenticated sample course is available.
+- Added page-specific branded titles, descriptions, canonicals, Open Graph,
+  and Twitter metadata. Root layout no longer assigns every route the same
+  homepage canonical. App routes default to noindex and have route metadata
+  plus noindex HTTP headers, including redirects. Shared conversations retain
+  social metadata but are excluded from search discovery.
+- Added server-rendered website/organization/application JSON-LD on the
+  homepage and breadcrumb JSON-LD on feature pages. Removed hidden promotional
+  text and delayed sitewide JSON-LD from the root layout. Added a real 1200×630
+  social image using the existing Intelar logo; visually inspected its output.
+- Public pages permit search crawling. OpenAI search/training bot groups
+  exclude personal app routes; general search crawlers can read their noindex
+  tags. Rendering assets remain crawlable. Added an optional `llms.txt` public
+  product reference without claiming it improves rankings or AI citations.
+- Preview deployments receive noindex metadata/headers, an empty sitemap,
+  and disallow-all robots without a conflicting allow directive.
+- Checks actually run: production build passed with Google Fonts network
+  access; `npx tsc --noEmit --incremental false` passed; focused SEO lint passed;
+  `git diff --check` passed. Initial build failed from disk exhaustion; cleared
+  only failed production output/cache and preserved active dev output, then
+  rebuilt successfully. Initial typecheck saw stale generated route types;
+  regenerated by the build and subsequent typechecks passed.
+- `npm run check:seo` passed against the local production server: six public
+  HTML responses with unique branded titles, H1s, canonicals, descriptions,
+  index directives, social images, homepage feature links, JSON-LD, app/API
+  noindex headers, private metadata/no inherited root canonical, bots policy,
+  sitemap entries, valid PNG dimensions, optional text reference, and true 404.
+  Preview configuration assertions passed for noindex, empty sitemap, and
+  disallow-all crawler rules.
+- Browser observations: public research content and feature directory rendered
+  at 360px with no horizontal overflow (356px measured document width). The
+  feature directory's explicit exam-preparation link navigated successfully.
+  The first heading-link attempt did not navigate; no browser console error
+  was captured. No broad cross-browser or accessibility audit is claimed.
+- Full repository lint remains unsuccessful: 10 errors and 36 warnings in
+  unchanged files. The touched landing page's prior mount-effect lint error
+  was resolved using the repository's existing hydration-safe mount pattern.
+- Added `docs/SEO.md` for deployment, verification, sitemap submission, crawler
+  policy, content maintenance, and production monitoring. No deployment,
+  Search Console/Bing property changes, indexing confirmation, ranking gain,
+  AI citation gain, or Core Web Vitals improvement is claimed.
+- Next action: deploy, configure and verify Google/Bing ownership, submit the
+  sitemap, run HTTP checks against production, and collect indexing/performance
+  evidence before claiming increased discoverability.
