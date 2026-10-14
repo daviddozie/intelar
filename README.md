@@ -1,81 +1,209 @@
 <div align="center">
   <h1>🔍 Intelar</h1>
-  <p><strong>A full-stack AI research agent — chat, search, read documents, and get cited answers.</strong></p>
+  <p><strong>A full-stack AI research agent, document intelligence engine, and adaptive learning platform.</strong></p>
   <p>
     <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js" />
     <img src="https://img.shields.io/badge/Mastra-1.3-blueviolet" alt="Mastra" />
     <img src="https://img.shields.io/badge/TypeScript-5-blue?logo=typescript" alt="TypeScript" />
     <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" />
+    <img src="https://img.shields.io/badge/Built%20with-OpenAI%20Codex-412991?logo=openai" alt="Built with OpenAI Codex" />
   </p>
 </div>
 
 ---
 
-## What is Intelar?
+## 📖 What is Intelar?
 
-The public landing page at `/` introduces research, learning, and collaboration. Open `/chat` for a new conversation; saved conversations remain at `/c/[id]`. Sign-in returns to `/chat` by default, and sign-out returns to the landing page.
+**Intelar** is an agentic research and learning platform designed to bridge the gap between unstructured web exploration, personal document libraries, and structured educational mastery.
 
-The landing-page header includes a light/dark switch that shares the app's saved theme preference. Product previews are illustrative; visitors can pause their animation, and reduced-motion preferences disable it.
+Traditional chatbots often hallucinate, lose long-term context, and provide answers without traceable sources. When users want to study or deeply understand complex topics, they are forced to manually piece together web searches, textbooks, and notes.
 
-Intelar is an AI-powered research assistant you can chat with. Unlike a standard chatbot, Intelar can:
-
-- 🔎 **Search the web** in real time and cite its sources
-- 📄 **Read your files** — upload a PDF, CSV, Word doc, or text file and ask questions about it
-- 🧠 **Run deep research** — automatically breaks complex questions into sub-queries, fetches full pages, ranks sources by credibility, and synthesises a structured answer with inline citations
-- 💬 **Remember your conversation** — persistent multi-turn memory across sessions
-- 🔒 **Secure by default** — Google & GitHub login via NextAuth
+Intelar transforms this entire workflow by uniting:
+1. **Autonomous Web Research**: A multi-step pipeline that independently plans sub-queries, crawls live web pages, scores domain credibility, and synthesises cited reports.
+2. **Document Intelligence (Hybrid RAG)**: The ability to upload documents (PDF, DOCX, CSV, TXT, images) and chat with them using vector embeddings, keyword overlap, and MMR deduplication.
+3. **Adaptive Learning & Exam Simulation**: Converting raw notes or missed exam questions into bite-sized, interactive study paths with verified explanations, untimed retries, and offline study packs.
+4. **Collaborative Team Workspaces**: Shared team spaces where groups can organize research, share document vaults, and summon `@Intelar` for contextual AI assistance in real-time.
 
 ---
 
-## ✨ Features
+## ✨ Core Features
 
-| Feature | Description |
-|---|---|
-| **Multi-step research pipeline** | Plan → Search → Deep-read → Rerank → Synthesise |
-| **RAG (document Q&A)** | Upload files; Intelar stores them in Pinecone and answers from them |
-| **Live web search** | Tavily API with advanced depth, 8 results, published dates |
-| **Source ranking** | TF-IDF relevance + domain credibility scoring |
-| **Hybrid vector search** | 70% vector similarity + 30% keyword overlap, MMR deduplication |
-| **Streaming responses** | Token-by-token streaming, no page reload |
-| **Conversation history** | Stored in Turso (LibSQL), synced per user |
-| **Image attachments** | Upload images via Cloudinary, passed to the agent |
-| **Auth** | Google and GitHub OAuth via NextAuth |
-| **Exam revision** | Create a Learn path from missed/unanswered exam questions, with verified source passages, explanations, untimed retries, and downloadable study packs |
+### 🔎 1. Autonomous Deep Research
+- **Dynamic Intent Routing**: Fast conversational queries receive instant answers, while complex questions trigger Intelar's multi-step deep research workflow.
+- **5-Step Research Pipeline**:
+  1. **Plan**: Decomposes intricate questions into 2–3 targeted research sub-queries.
+  2. **Gather**: Executes real-time searches via the Tavily API with rate-limiting courtesy delays.
+  3. **Deep-Fetch**: Scrapes and parses the top source URLs, stripping away HTML boilerplate and extracting core prose.
+  4. **Rerank**: Evaluates every source using TF-IDF text relevance combined with domain credibility scoring.
+  5. **Synthesise**: Formulates an exhaustive, objective response backed by verifiable inline `[Source](URL)` citations.
 
-On a saved exam's results screen, select **Help me revise** to open the
-revision in Learn. Preparation requires internet access to check the
-original documents. Download the path from Learn's dashboard for offline
-study. The plan reuses AI-prepared exam explanations and questions; it
-does not independently verify the answers or infer mastery by topic.
-Missing/unverifiable source excerpts prevent creation. Repeated requests
-for the same attempt reopen the existing plan and preserve progress.
+### 📄 2. Hybrid Document RAG
+- **Multi-Format Ingestion**: Supports `.pdf`, `.docx`, `.csv`, `.txt`, `.md`, and image formats (`.png`, `.jpg`, `.webp`).
+- **Semantic Chunking**: Breaks documents down at natural paragraph and sentence boundaries for optimal retrieval granularity.
+- **Hybrid Search**: Combines 70% vector similarity (`all-MiniLM-L6-v2`) with 30% keyword overlap, applying Maximal Marginal Relevance (MMR) to eliminate redundant chunks.
+- **Image Intelligence**: Direct image OCR and multimodal perception powered by OpenRouter vision models.
 
-Run `npm run check:revision` for the revision service and HTTP-boundary tests.
+### 🎓 3. Interactive Learning & Exam Prep
+- **Curated Study Paths**: Transform up to three resource files into a structured 3–5 lesson syllabus.
+- **Micro-Lessons & Practice**: Each lesson pairs key concepts with traceable source excerpts and 3 multiple-choice check questions with hints and explanations.
+- **Exam Simulation & Revision Plans**: Practice under timed conditions; missed questions can be instantly converted into a targeted revision module with verified source excerpts.
+- **Offline Study Packs & Sync**: Download learning materials for offline study. Progress made offline reconciles seamlessly without duplicate submissions upon reconnection.
 
-Public search discovery uses `/robots.txt`, `/sitemap.xml`, pre-rendered
-`/features` pages, per-page metadata, structured data, and `/og-image.png`.
-Personal app pages are marked noindex. See [docs/SEO.md](docs/SEO.md) for
-canonical domain configuration, crawler policies, Google/Bing verification,
-deployment checks, and `npm run check:seo`.
+### 👥 4. Team Workspaces & Live Collaboration
+- **Shared Document Vaults**: Organize resources and research records within private, invite-only team workspaces.
+- **Collaborative Group Chat**: Discuss findings in real time with colleagues, inviting `@Intelar` to synthesize group context and answer shared queries.
+- **Real-Time Presence**: Live typing indicators, presence, and message broadcasts powered by Supabase Realtime channels with zero periodic client polling.
+
+### ⚡ 5. Modern UX & Performance
+- **Token-by-Token Streaming**: Instant feedback with fluid markdown streaming, syntax highlighting, and collapsible source drawers.
+- **Persistent Multi-Turn Memory**: Conversation history persists in Turso (LibSQL), organized per user.
+- **Accessible & Responsive**: Fully responsive from 360px mobile screens up to desktop displays, with full light/dark mode support and respect for reduced-motion preferences.
 
 ---
 
-## 🛠 Tech Stack
+## 🏗️ System Architecture
 
-| Layer | Technology |
-|---|---|
-| **Framework** | [Next.js 16](https://nextjs.org) (App Router, Turbopack) |
-| **AI orchestration** | [Mastra](https://mastra.ai) + `@mastra/core` |
-| **LLM** | [OpenRouter](https://openrouter.ai) — `openai/gpt-4o-mini` by default (configurable via `OPENROUTER_MODEL`, e.g. `openai/gpt-4o`) |
-| **Embeddings** | HuggingFace `sentence-transformers/all-MiniLM-L6-v2` |
-| **Vector DB** | [Pinecone](https://pinecone.io) |
-| **Database** | [Turso](https://turso.tech) (LibSQL) — conversations + research sessions |
-| **File storage** | [Cloudinary](https://cloudinary.com) |
-| **Auth** | [NextAuth v4](https://next-auth.js.org) — Google + GitHub |
-| **Server-state cache** | TanStack Query — conversations and user resources |
-| **Workspace real-time chat** | Supabase Realtime Broadcast and Presence; Turso-backed messages and unread cursors |
-| **UI** | React 19, Tailwind CSS v4, shadcn/ui, Lucide icons |
-| **Language** | TypeScript 5 |
+Intelar is built as a modular, full-stack TypeScript application where the Next.js App Router coordinates presentation and authorization, Mastra powers agent reasoning and deterministic workflows, and resilient external services handle embeddings, vector search, persistence, and real-time messaging.
+
+### Architecture Overview
+
+```mermaid
+graph TD
+    subgraph Client["Frontend Client (Next.js 16 / React 19)"]
+        UI["Chat, Learn & Workspace UI"]
+        TQ["TanStack Query (Server State Cache)"]
+        RC["React Context (Streaming & Session UI)"]
+        RT_Client["Supabase Realtime Client"]
+    end
+
+    subgraph Server["Next.js App Router (Server API)"]
+        Auth["NextAuth v4 (OAuth & Session Validation)"]
+        ChatAPI["/api/chat (Streaming & Intent Routing)"]
+        IngestAPI["/api/ingest (Document Processing)"]
+        WorkspaceAPI["/api/workspaces (JWT Issuance & Membership)"]
+        LearnAPI["/api/learn & /api/exam-revision"]
+    end
+
+    subgraph Mastra["Mastra Framework (AI Orchestration)"]
+        Agent["Intelar Agent (Reasoning & System Persona)"]
+        ResearchWF["5-Step Deep Research Workflow"]
+        Tools["Tools: Search, Fetch, Rerank, Document RAG"]
+    end
+
+    subgraph Storage["Persistence & External Services"]
+        LLM["OpenRouter (GPT-4o-mini / GPT-4o)"]
+        Tavily["Tavily Search API"]
+        Pinecone["Pinecone (Vector DB + Hybrid Search)"]
+        Turso["Turso / LibSQL (Conversations & Learning State)"]
+        Supabase["Supabase Realtime (Presence & Broadcasts)"]
+        Cloudinary["Cloudinary (Image Storage)"]
+    end
+
+    UI --> TQ & RC & RT_Client
+    TQ & RC --> ChatAPI & IngestAPI & WorkspaceAPI & LearnAPI
+    ChatAPI --> Auth
+    ChatAPI --> Agent
+    Agent --> ResearchWF
+    Agent --> Tools
+    Tools --> Tavily
+    Tools --> Pinecone
+    Agent --> LLM
+    IngestAPI --> Cloudinary & Pinecone
+    WorkspaceAPI --> Turso & Supabase
+    LearnAPI --> Turso
+    RT_Client -.-> Supabase
+```
+
+### Core Architectural Layers
+
+1. **Presentation & State Management**:
+   - **TanStack Query** manages server state (user conversations, resource collections, study paths) with automatic invalidation and optimistic updates.
+   - **React Context** manages ephemeral state: active chat streams, draft inputs, sidebars, and theme preferences.
+   - Direct `fetch` streams power token delivery and multipart file uploads.
+
+2. **Agentic Layer (Mastra Framework)**:
+   - Configured in `src/mastra/index.ts`, Mastra decouples AI business logic from API handlers.
+   - The **Intelar Agent** utilizes custom instructions enforcing strict citation behavior, neutral tone, and tool routing.
+   - The **Research Workflow** deterministically steps through `plan → gather → deep-fetch → rerank → synthesise`, preventing agent drift during complex multi-hop investigations.
+
+3. **Hybrid Retrieval-Augmented Generation (RAG)**:
+   - Ingestion extracts and normalizes text from PDFs, DOCX, CSVs, and TXT files.
+   - Vectors are generated using HuggingFace's `sentence-transformers/all-MiniLM-L6-v2` and indexed in Pinecone under user/conversation namespaces.
+   - Queries execute hybrid scoring (70% dense vector similarity + 30% sparse keyword matching) with Maximal Marginal Relevance (MMR) deduplication.
+
+4. **Persistence & Real-Time Sync**:
+   - **Turso (LibSQL)** provides durable, low-latency relational persistence for users, messages, resource records, and exam revision attempts.
+   - **Supabase Realtime** delivers sub-second message broadcasts and presence in collaborative workspaces via ephemeral, member-scoped ES256 JWT tokens issued by Next.js.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Framework** | [Next.js 16](https://nextjs.org) | App Router, Server Actions, Route Handlers, Turbopack |
+| **Language** | [TypeScript 5](https://www.typescriptlang.org/) | Strict static typing across client, server, and agents |
+| **AI Orchestration** | [Mastra](https://mastra.ai) | Declarative agent loops, structured workflows, memory, and tools |
+| **LLM Provider** | [OpenRouter](https://openrouter.ai) | Default model: `openai/gpt-4o-mini` (configurable) |
+| **Vector DB** | [Pinecone](https://pinecone.io) | Multi-tenant vector index with metadata filtering |
+| **Embeddings** | HuggingFace Inference | `sentence-transformers/all-MiniLM-L6-v2` |
+| **Relational DB** | [Turso](https://turso.tech) (LibSQL) | Serverless SQLite for conversation and learning data |
+| **Realtime** | [Supabase Realtime](https://supabase.com) | Presence and live broadcasts for workspaces |
+| **Web Search** | [Tavily API](https://tavily.com) | Real-time web search and page content extraction |
+| **Media Storage** | [Cloudinary](https://cloudinary.com) | Image and attachment hosting |
+| **Authentication** | [NextAuth v4](https://next-auth.js.org) | Secure OAuth with Google and GitHub |
+| **UI Components** | Tailwind CSS v4, shadcn/ui, Lucide | Modern, accessible, responsive component library |
+
+---
+
+## 📁 Directory Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx                     # Landing page introducing Intelar
+│   ├── chat/page.tsx                # Main AI research chat interface
+│   ├── c/[id]/page.tsx              # Persistent conversation view
+│   ├── learn/                       # Learning paths & practice quizzes
+│   ├── workspaces/                  # Collaborative team workspaces
+│   ├── resources/                   # Document library & file management
+│   ├── settings/                    # User preferences & data management
+│   └── api/
+│       ├── chat/route.ts            # Streaming chat handler (RAG / Research Workflow)
+│       ├── ingest/route.ts          # Document parsing → Pinecone vector indexing
+│       ├── upload/route.ts          # Media upload to Cloudinary
+│       ├── conversations/           # Conversation CRUD operations
+│       ├── learn/                   # Study paths and attempt synchronization
+│       ├── exam-revision/           # Missed-question revision generator
+│       └── workspaces/              # Workspace creation, invites, and tokens
+├── components/
+│   ├── chat-window.tsx              # Message timeline renderer
+│   ├── chat-input.tsx               # Multimodal input bar with attachments
+│   ├── message-bubble.tsx           # Markdown renderer with citation popovers
+│   ├── resources-library.tsx        # Searchable document repository grid/list
+│   ├── workspace-chat.tsx           # Real-time team collaboration view
+│   ├── query-provider.tsx           # TanStack Query client configuration
+│   └── sidebar.tsx                  # Historical conversations and navigation
+├── lib/
+│   ├── auth.ts                      # NextAuth configuration & callbacks
+│   ├── db.ts                        # Turso/LibSQL database client
+│   ├── vector-store.ts              # Pinecone hybrid search + MMR deduplication
+│   ├── embeddings.ts                # HuggingFace embedding utilities
+│   ├── document-processor.ts        # PDF, DOCX, CSV, TXT parsers & chunkers
+│   ├── queries/                     # TanStack Query keys & API request functions
+│   └── temporal/                    # Freshness policy & query intent classifiers
+└── mastra/
+    ├── index.ts                     # Mastra framework initialization
+    ├── agents/
+    │   ├── intelar-agent.ts         # Primary research & chat agent
+    │   └── intelar-instructions.ts  # System prompts, persona & guardrails
+    ├── tools/
+    │   ├── web-search-tool.tsx      # Tavily search integration
+    │   ├── web-fetch-tool.ts        # Prose-focused page scraper
+    │   └── source-rerank-tool.ts    # TF-IDF & domain credibility scorer
+    └── workflows/
+        └── research-workflow.ts     # 5-step deep research pipeline
+```
 
 ---
 
@@ -83,210 +211,108 @@ deployment checks, and `npm run check:seo`.
 
 ### Prerequisites
 
-- Node.js 22.13+
-- A Supabase project with Realtime enabled for workspace chat
-- Accounts (all have free tiers): [OpenRouter](https://openrouter.ai), [Pinecone](https://pinecone.io), [Turso](https://turso.tech), [Cloudinary](https://cloudinary.com), [Tavily](https://tavily.com)
-- Google and/or GitHub OAuth app credentials
+- **Node.js**: `v22.13.0` or higher
+- **Accounts & API Keys** (free tiers available):
+  - [OpenRouter](https://openrouter.ai) — LLM completions
+  - [Pinecone](https://pinecone.io) — Vector database
+  - [Turso](https://turso.tech) — LibSQL database
+  - [Tavily](https://tavily.com) — Web search
+  - [Cloudinary](https://cloudinary.com) — Attachment storage
+  - [Supabase](https://supabase.com) — Workspace realtime channels
+  - Google or GitHub Developer account — NextAuth credentials
 
-### 1. Clone the repo
+### 1. Clone & Install
 
 ```bash
 git clone https://github.com/daviddozie/intelar.git
 cd intelar
-```
-
-### 2. Install dependencies
-
-```bash
 npm install
 ```
 
-### 3. Set up environment variables
+### 2. Configure Environment Variables
 
-Copy the example file and fill in your keys:
+Create `.env.local` by copying the example file:
 
 ```bash
 cp .env.example .env.local
 ```
 
-| Variable | Where to get it |
-|---|---|
-| `OPENROUTER_API_KEY` | [openrouter.ai/keys](https://openrouter.ai/keys) |
-| `TAVILY_API_KEY` | [tavily.com](https://tavily.com) |
-| `PINECONE_API_KEY` | [app.pinecone.io](https://app.pinecone.io) |
-| `PINECONE_INDEX` | Your index name in Pinecone (e.g. `intelar`) |
-| `PINECONE_HOST` | Your index host URL from the Pinecone dashboard |
-| `TURSO_DATABASE_URL` | `libsql://your-db.turso.io` |
-| `TURSO_AUTH_TOKEN` | From your Turso dashboard |
-| `CLOUDINARY_CLOUD_NAME` | [cloudinary.com/console](https://cloudinary.com/console) |
-| `CLOUDINARY_API_KEY` | Cloudinary dashboard |
-| `CLOUDINARY_API_SECRET` | Cloudinary dashboard |
-| `NEXTAUTH_SECRET` | Run `openssl rand -base64 32` |
-| `NEXTAUTH_URL` | `http://localhost:3000` (dev) or your production URL |
-| `GOOGLE_CLIENT_ID` | [console.cloud.google.com](https://console.cloud.google.com) |
-| `GOOGLE_CLIENT_SECRET` | Google Cloud Console |
-| `GITHUB_CLIENT_ID` | [github.com/settings/developers](https://github.com/settings/developers) |
-| `GITHUB_CLIENT_SECRET` | GitHub Developer Settings |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable API key; safe for browser use |
-| `SUPABASE_SECRET_KEY` | Supabase secret API key; server only |
-| `SUPABASE_REALTIME_JWT_KID` | `kid` of the ES256 signing key registered under Supabase Auth → JWT Signing Keys |
-| `SUPABASE_REALTIME_JWT_PRIVATE_JWK` | Private ES256 JWK used by Next.js to issue five-minute workspace-scoped tokens; server only |
+Populate the required configuration keys:
 
-### 4. Run the development server
+| Variable | Description | Where to Get It |
+|---|---|---|
+| `OPENROUTER_API_KEY` | Access key for LLM models | [OpenRouter Keys](https://openrouter.ai/keys) |
+| `OPENROUTER_MODEL` | Default LLM (default: `openai/gpt-4o-mini`) | [OpenRouter Models](https://openrouter.ai/models) |
+| `TAVILY_API_KEY` | Search API key | [Tavily Dashboard](https://tavily.com) |
+| `PINECONE_API_KEY` | Vector database API key | [Pinecone Console](https://app.pinecone.io) |
+| `PINECONE_INDEX` | Index name (e.g. `intelar`) | Pinecone Dashboard |
+| `PINECONE_HOST` | Index host URL | Pinecone Dashboard |
+| `TURSO_DATABASE_URL` | LibSQL connection URL (`libsql://...`) | [Turso Console](https://turso.tech) |
+| `TURSO_AUTH_TOKEN` | Turso database authentication token | Turso Console |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | [Cloudinary Console](https://cloudinary.com/console) |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | Cloudinary Console |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | Cloudinary Console |
+| `NEXTAUTH_SECRET` | NextAuth encryption secret | Generate with `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | Application base URL (`http://localhost:3000`) | Local or deployed URL |
+| `GOOGLE_CLIENT_ID` / `_SECRET` | Google OAuth app credentials | [Google Cloud Console](https://console.cloud.google.com) |
+| `GITHUB_CLIENT_ID` / `_SECRET` | GitHub OAuth app credentials | [GitHub Developer Settings](https://github.com/settings/developers) |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Supabase Dashboard |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key | Supabase Dashboard |
+| `SUPABASE_SECRET_KEY` | Supabase server secret key | Supabase Dashboard |
+| `SUPABASE_REALTIME_JWT_KID` | Key ID for ES256 JWT tokens | Supabase Auth → JWT Signing Keys |
+| `SUPABASE_REALTIME_JWT_PRIVATE_JWK` | Private ES256 JWK string | Server-only private signing key |
+
+### 3. Database & Realtime Setup
+
+1. **Turso**: Ensure your database is created:
+   ```bash
+   turso db create intelar
+   turso db tokens create intelar
+   ```
+2. **Supabase Realtime**: Apply the migration in `supabase/migrations/20260929000000_workspace_realtime.sql` via the Supabase SQL Editor to authorize private workspace channels.
+
+### 4. Run Locally
 
 ```bash
+# Start Next.js web application (http://localhost:3000)
 npm run dev
+
+# Or start both Next.js and Mastra Studio concurrently
+npm run dev:all
 ```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-Workspace chat uses Supabase Realtime and does not need a separate socket process or Redis. Set the Supabase variables in `.env.local`. Get the URL and publishable/secret API keys from the Supabase project dashboard. Generate an ES256 signing key with `supabase gen signing-key --algorithm ES256`, register the matching public JWK in Supabase Auth → JWT Signing Keys, activate it, then configure the key `kid` and private JWK on the server. Keep the secret API key and private JWK out of browser variables and source control. Apply `supabase/migrations/20260929000000_workspace_realtime.sql` in the Supabase SQL Editor; it authorizes private workspace message, ephemeral, and per-user read-cursor channels using short-lived member-scoped JWT claims. The app continues to store chat messages and unread read-cursors in Turso. Run `npm run dev:all` to start Next.js and Mastra Studio.
-
-Workspace Realtime carries saved-message broadcasts, presence, and typing only. The free Supabase tier has finite connection and message quotas; Realtime broadcast fan-out contributes usage per recipient, so monitor Realtime usage as workspaces grow. `@Intelar` replies are generated after the HTTP send response within the Next.js function lifetime; this is not a durable job queue.
-
-### Troubleshooting database connections
-
-Conversations and workspace membership both require Turso. A `ConnectTimeoutError` means the app could not establish a connection to the configured database endpoint. Workspace Realtime tokens also require a membership lookup, so a Turso connection failure can prevent token issuance before Supabase configuration is checked.
-
-Verify that `TURSO_DATABASE_URL` matches `turso db show <database-name> --url`, then check the same hostname over HTTPS with `curl -I --connect-timeout 10 https://<database-host>`. If the connection times out, check your network, VPN, firewall, and the database's availability in Turso. Restart Next.js after changing `.env.local`.
-
-Conversation and workspace list requests return HTTP 503 for database connection failures. Their views show the error with a Retry button and keep any cached entries visible.
-
----
-
-## 📁 Project Structure
-
-```
-src/
-├── app/
-│   ├── page.tsx                  # Main chat UI
-│   ├── resources/page.tsx         # User resource library
-│   ├── login/page.tsx            # Auth screen
-│   └── api/
-│       ├── chat/route.ts         # Streaming chat endpoint (RAG + agent + research)
-│       ├── ingest/route.ts       # Document → Pinecone embedding pipeline
-│       ├── upload/route.ts       # File → Cloudinary upload
-│       ├── conversations/        # CRUD for conversation history
-│       ├── resources/             # User resource listing and actions
-│       └── auth/                 # NextAuth handler
-├── components/
-│   ├── query-provider.tsx        # App-wide TanStack Query client
-│   ├── resources-library.tsx     # Searchable grid/list resource views
-│   ├── chat-window.tsx           # Message list renderer
-│   ├── chat-input.tsx            # Input bar with file attachment support
-│   ├── message-bubble.tsx        # Per-message component (markdown + citations)
-│   └── sidebar.tsx               # Conversation history sidebar
-├── lib/
-│   ├── auth.ts                   # NextAuth config
-│   ├── db.ts                     # Turso/LibSQL client
-│   ├── queries/                  # Query keys and server-state API functions
-│   ├── embeddings.ts             # HuggingFace embedding wrapper (soft-fail on errors)
-│   ├── vector-store.ts           # Pinecone store + hybrid search + MMR deduplication
-│   ├── document-processor.ts     # PDF/CSV/DOCX/TXT parser + semantic chunker
-│   └── research-store.ts         # Research session persistence (Turso)
-└── mastra/
-    ├── index.ts                  # Mastra config — agent + workflow registration
-    ├── agents/
-    │   └── intelar-agent.ts         # Main AI agent (tools, memory, system prompt)
-    ├── tools/
-    │   ├── web-search-tool.tsx   # Tavily web search
-    │   ├── web-fetch-tool.ts     # Full-page HTML extractor
-    │   └── source-rerank-tool.ts # TF-IDF + domain credibility ranker
-    └── workflows/
-        └── research-workflow.ts  # 5-step deep research pipeline
-```
-
----
-
-## Client Data Architecture
-
-- **TanStack Query** owns authenticated server state for conversations and uploaded resources. Query keys are scoped by user, and cache updates or invalidation follow server mutations.
-- **React Context** owns transient UI and in-progress chat state: active conversation, sidebar, theme, guest drafts, and streamed assistant messages.
-- **Direct fetch flows** remain for streamed AI responses, multipart uploads, and speech requests because they use response streams or file bodies.
-- **Server boundaries** remain Next.js API routes plus `src/lib` persistence/search helpers and Mastra agents/workflows. Client caching does not replace server-side authorization.
-
-## �� How the Research Pipeline Works
-
-When Intelar detects a research-type question, it runs a 5-step Mastra workflow instead of a single agent call:
-
-```
-1. Plan        → Break the question into 2–3 focused sub-queries
-2. Gather      → Run Tavily search for each sub-query (with rate-limit courtesy delays)
-3. Deep-fetch  → Fetch the top 3 URLs in full — strip boilerplate, extract prose
-4. Rerank      → Score every source by TF-IDF relevance + domain credibility
-5. Synthesise  → Write a structured answer with inline [Title](URL) citations
-```
-
-For document questions (e.g. *"list the orders in the file"*), the research workflow is skipped. Intelar answers directly from Pinecone RAG — one LLM call, no web search.
-
----
-
-## 📄 Supported File Types
-
-| Type | Extension(s) |
-|---|---|
-| PDF | `.pdf` |
-| Word | `.docx` |
-| Spreadsheet | `.csv` |
-| Plain text | `.txt`, `.md` |
-| Images | `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp` |
-
-Documents are semantically chunked (paragraph → sentence boundaries) and stored in Pinecone. Images are uploaded to Cloudinary and passed directly to the agent.
-
----
-
-## 🔑 Rate Limits & Model Configuration
-
-The default model is `openai/gpt-4o-mini` (or customize via `OPENROUTER_MODEL` in `.env.local`, e.g. `openai/gpt-4o`).
-
-To configure your model or limits:
-- Set `OPENROUTER_MODEL` in `.env.local` to any slug from [openrouter.ai/models](https://openrouter.ai/models) (e.g. `openai/gpt-4o-mini`, `openai/gpt-4o`, etc.)
-- Set `OPENROUTER_VISION_MODEL` in `.env.local` to specify the multimodal model used for image OCR and search indexing (defaults to `openai/gpt-4o-mini`, or `openai/gpt-4o`).
-- Add credits on OpenRouter if using paid models or to unlock higher throughput.
 
 ---
 
 ## 📦 Available Scripts
 
-| Script | Description |
+| Script | Purpose |
 |---|---|
-| `npm run dev` | Start Next.js dev server (Turbopack) |
-| `npm run dev:all` | Start Next.js and Mastra Studio concurrently |
-| `npm run mastra` | Start Mastra Studio only (`localhost:4111`) |
-| `npm run build` | Build for production |
-| `npm run start` | Run the production build |
-| `npm run lint` | Run ESLint |
+| `npm run dev` | Start the Next.js development server with Turbopack |
+| `npm run mastra` | Launch Mastra Agent Studio at `localhost:4111` |
+| `npm run dev:all` | Run Next.js and Mastra Studio concurrently |
+| `npm run build` | Compile and build the Next.js production bundle |
+| `npm run start` | Start the compiled production server |
+| `npm run lint` | Run ESLint across all codebase files |
+| `npm run check:foundation` | Run automated foundation and database tests |
+| `npm run check:learning` | Verify learning path creation and quiz loop logic |
+| `npm run check:offline` | Test offline study pack downloads and attempt sync |
+| `npm run check:revision` | Test exam revision plan generation and validation |
+| `npm run check:seo` | Validate canonical URLs, robots.txt, and metadata tags |
+
+---
+
+## 🤖 Built with OpenAI Codex
+
+Intelar was developed with the assistance of **OpenAI Codex**, leveraging AI-assisted coding and agentic workflows to build, test, and refine its full-stack architecture.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to get involved.
+Contributions are welcome! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on code style, branch management, and submitting pull requests.
 
 ---
 
 ## 📄 License
 
-MIT — see [LICENSE](./LICENSE) for details.
-# Workspaces
-
-Signed-in users can create private workspaces at `/workspaces`. Workspace APIs
-authorize every request against the signed-in email's membership. Owners can
-invite people by email; invitations expire after seven days and can only be
-accepted by signing in with the invited email. Configure `RESEND_API_KEY` and
-`RESEND_FROM_EMAIL` to send invitations. If either setting is missing, the
-workspace page displays a copyable invitation link instead.
-
-Workspace chat is text-only. Mention `@Intelar` in a message to get an assistant
-reply in the shared conversation. Projects and workspace resource records are
-scoped to their workspace. Resource files are served through a member-checked
-endpoint; the underlying files still use the app's existing storage providers.
-Workspace chat uses private Supabase Realtime channels for live delivery,
-presence, typing indicators, and in-app message notices. Turso remains the
-durable source for messages and per-member unread cursors; there is no periodic
-message polling. Video calls and browser push notifications are not included.
-
-### Personal settings
-
-Open Settings from the sidebar account menu, or the guest Settings button. Appearance and motion preferences apply across the app and landing page. Signed-in preferences sync through `/api/settings`; guest preferences stay in the browser. Settings uses an additive `user_settings` table in the existing Turso database and requires no new environment variables. Account details are read-only. Data & storage shows browser study-pack and pending-attempt counts; manage downloads in Learn.
+This project is licensed under the Apache License 2.0 / MIT. See [LICENSE](./LICENSE) and [NOTICE](./NOTICE) for details.
