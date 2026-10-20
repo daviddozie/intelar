@@ -76,6 +76,8 @@ A learner uploads a course document/manual, configures difficulty (easy/medium/h
 - Add a results action for missed and unanswered questions.
 - Read the exact saved attempt and exam using the authenticated owner.
 - Verify source excerpts against authorized original documents.
+- Expand abbreviated exam quotes only when every substantial fragment matches
+  in order within one authorized document; save the complete original passage.
 - Save one ready revision path atomically; repeated requests reuse it.
 - Open the path in Learn and reuse progress and offline study-pack behavior.
 - Keep revision lessons focused on saved questions; support one to five

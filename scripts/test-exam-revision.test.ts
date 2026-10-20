@@ -86,6 +86,44 @@ test("one mistake needs only one lesson; 50 misses are all covered in at most fi
     }
 });
 
+test("abbreviated quotes expand to the complete owned passage without changing saved questions", async () => {
+    for (const ellipsis of ["…", "..."]) {
+        const exam = makeExam(1);
+        const abbreviated = `Force equals mass multiplied by acceleration${ellipsis}requires a force of 6 N.`;
+        exam.questions[0].sourceExcerpt = abbreviated;
+        const attempt = await saveAttempt(exam);
+        const path = await revision.createExamRevisionPath(owner, exam.id, attempt.id);
+        assert.equal(path.lessons[0].sources?.[0].excerpt, excerpt);
+        assert.equal(path.lessons[0].questions?.[0].explanation, exam.questions[0].explanation);
+        assert.equal((await exams.getExamPrep(owner, exam.id)).questions[0].sourceExcerpt, abbreviated);
+        assert.equal((await revision.createExamRevisionPath(owner, exam.id, attempt.id)).id, path.id);
+    }
+});
+
+test("abbreviated quotes cannot hide fabricated, reversed, foreign, or distant fragments", async () => {
+    const { resolveExamSource } = requireProject(resolve("src/lib/exam-sources.ts")) as typeof import("../src/lib/exam-sources");
+    const docs = [{ url, name: "Mechanics.txt", text, chunks: [] }];
+    for (const quote of [
+        "Force equals mass multiplied by acceleration…an invented ending that is unsupported.",
+        "requires a force of 6 N.…Force equals mass multiplied by acceleration",
+        `Force equals mass multiplied by acceleration…${secondExcerpt}`,
+        "Force equals mass multiplied by acceleration…6 N.",
+    ]) assert.equal(resolveExamSource(quote, docs), undefined);
+    assert.equal(resolveExamSource(`Force equals mass multiplied by acceleration…${secondExcerpt}`, [
+        ...docs, { url: secondUrl, name: "Work.txt", text: secondExcerpt, chunks: [] },
+    ]), undefined, "Fragments from different documents must not be combined");
+    assert.equal(resolveExamSource("Force equals mass multiplied by acceleration…requires a force of 6 N.", [
+        { ...docs[0], text: `Force equals mass multiplied by acceleration${" ".padEnd(12100, "x")}requires a force of 6 N.` },
+    ]), undefined);
+
+    const exam = makeExam(1);
+    exam.questions[0].sourceExcerpt = "Force equals mass multiplied by acceleration…an invented ending that is unsupported.";
+    const attempt = await saveAttempt(exam);
+    const initial = await learning.getUserLearningPaths(owner);
+    await assert.rejects(revision.createExamRevisionPath(owner, exam.id, attempt.id), /verifiable source excerpt/);
+    assert.equal((await learning.getUserLearningPaths(owner)).length, initial.length);
+});
+
 test("concurrent retries reuse one ready path and preserve progress", async () => {
     const exam = makeExam();
     const attempt = await saveAttempt(exam);
