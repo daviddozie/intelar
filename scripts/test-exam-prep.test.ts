@@ -101,6 +101,7 @@ test("Generates an exam with exactly 10 questions and 4 options per question", a
         assert.equal(q.options.length, 4, `Question ${i + 1} must have exactly 4 choices`);
         assert.ok(q.correctAnswer >= 0 && q.correctAnswer <= 3, `Question ${i + 1} correctAnswer in 0..3`);
         assert.ok(q.explanation.length > 5, `Question ${i + 1} must have explanation`);
+        assert.ok(q.sourceExcerpt && textbookText.toLowerCase().replace(/\s+/g, " ").includes(q.sourceExcerpt.toLowerCase().replace(/\s+/g, " ")), `Question ${i + 1} must have a complete source passage`);
     }
 });
 

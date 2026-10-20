@@ -1,6 +1,11 @@
 # Intelar Learning Progress
 
 ## Current status
+Follow-up on 2026-10-20: repaired revision rejection for abbreviated exam
+quotes. The reported AWS attempt now builds five lessons covering nine missed
+questions in a read-only live-data check; saving/navigation in the signed-in
+browser remains unverified. Details are recorded below.
+
 Exam-to-Learn revision implementation added on 2026-10-13. Service and HTTP
 acceptance checks pass; signed-in browser navigation and offline reload for
 the new revision journey remain unverified. Historical milestone results
@@ -320,6 +325,33 @@ Ready for user feedback and pilot trials on course manuals with calculation and 
   and actual offline reload. The live check called the service directly and
   does not establish end-to-end browser behavior or eliminate possible
   future provider/network outages.
+
+### Revision 422 from abbreviated source quotes (2026-10-20)
+
+- Read-only checks of the reported AWS exam found that question 2 combined
+  two real source fragments with an ellipsis. The continuous-quote validator
+  rejected it, although both fragments existed in order in the owned document.
+- Added a shared exam-source resolver. Exact quotes keep existing behavior.
+  Abbreviated quotes require every fragment to contain at least 15 characters
+  and match in order within the same document. Expansion is bounded to 12,000
+  characters and eight fragments; unsupported, reversed, or cross-document
+  fragments fail. Saved revision citations contain the complete original
+  passage, including omitted text. No fuzzy/prefix-only matching is used.
+- Exam generation now requests continuous verbatim excerpts, drops unverified
+  AI questions before deterministic filling, and verifies all final questions
+  before persistence. Existing exam questions, answers, scores, progress, and
+  ownership checks are preserved. No dependencies or schema changes.
+- Read-only live verification: the reported exam's latest saved attempt builds
+  five lessons with all nine missed/unanswered questions, and all resulting
+  source passages match its owned document. No live records were changed.
+- Checks: revision 9/9, exam 8/8, offline 9/9; TypeScript and diff checks passed.
+  Focused ESLint reports zero errors and three pre-existing unused-variable
+  warnings. Full lint reports nine errors and 36 warnings in existing code.
+- Production build passed with network access. The initial restricted build
+  failed fetching Geist/Geist Mono from Google Fonts.
+- Next action: retry Help me revise for the existing AWS exam in the signed-in
+  browser and verify Learn navigation, persistence, and offline reload before
+  marking the remaining Milestone 7 browser acceptance complete.
 
 ## Public SEO and AI Search Discovery (2026-10-13)
 

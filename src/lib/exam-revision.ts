@@ -4,12 +4,9 @@ import { getExamAttempt, getExamPrep } from "./exam-db";
 import { getLearningPath, initLearningDB, LearningNotFoundError } from "./learning-db";
 import { extractResourceTexts } from "./learning-generator";
 import { InvalidSourceReferenceError, OutlineStructureError } from "./learning-errors";
+import { resolveExamSource } from "./exam-sources";
 import type { ExamAttempt, ExamPrep } from "./exam-types";
 import type { LearningLesson, LearningPath, ResourceDocumentText } from "./learning-types";
-
-function normalize(text: string): string {
-    return text.toLowerCase().replace(/\s+/g, " ").trim();
-}
 
 /** Use saved questions rather than inventing topics or new answers from a score. */
 export function buildRevisionLessons(
@@ -27,13 +24,11 @@ export function buildRevisionLessons(
     for (let start = 0; start < missed.length; start += groupSize) {
         const group = missed.slice(start, start + groupSize);
         const sources = group.map(({ question, number }) => {
-            const excerpt = question.sourceExcerpt?.trim() || "";
-            const document = excerpt.length >= 15
-                ? documents.find((doc) => normalize(doc.text).includes(normalize(excerpt)))
-                : undefined;
-            if (!document) {
+            const source = resolveExamSource(question.sourceExcerpt, documents);
+            if (!source) {
                 throw new InvalidSourceReferenceError(`Question ${number} has no verifiable source excerpt. Review its explanation below or create a new exam from your materials.`);
             }
+            const { document, excerpt } = source;
             return {
                 id: randomUUID(),
                 title: document.name,

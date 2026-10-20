@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { extractResourceTexts, checkSourceSufficiency } from "./learning-generator";
 import { saveExamPrep } from "./exam-db";
+import { resolveExamSource } from "./exam-sources";
+import { InvalidSourceReferenceError } from "./learning-errors";
 import type {
     ExamDifficulty,
     ExamPrep,
@@ -34,7 +36,7 @@ const generatedExamSchema = z.object({
 });
 
 async function generateAIBatch(
-    agent: any,
+    agent: { generate: (prompt: string) => Promise<{ text: string }> },
     context: string,
     targetCount: number,
     difficulty: ExamDifficulty,
@@ -65,6 +67,7 @@ Guidelines:
 4. Indicate the zero-indexed correct answer (0 for A, 1 for B, 2 for C, 3 for D).
 5. Provide a clear, educational explanation (1-3 sentences) citing the exact concept or excerpt from the manual, and detailing the step-by-step mathematical working for calculation questions.
 6. Keep questions and options concise and avoid conversational filler.
+7. Include sourceExcerpt for every question: copy one continuous passage of at least 15 characters verbatim from the document. Do not paraphrase it or join separate passages with ellipses.
 
 Respond ONLY with a JSON object in this format (no markdown code blocks, no other text):
 {
@@ -173,6 +176,12 @@ export async function generateExamFromDocument(params: GenerateExamParams): Prom
         }
     }
 
+    // Discard unsupported AI questions before filling gaps with document-based questions.
+    generatedQuestions = generatedQuestions.flatMap((question) => {
+        const source = resolveExamSource(question.sourceExcerpt, resourceTexts);
+        return source ? [{ ...question, sourceExcerpt: source.excerpt }] : [];
+    });
+
     // 3. Fallback: Deterministic Document Synthesis if AI returned fewer questions or failed
     if (generatedQuestions.length < questionCount) {
         const fallbackQuestions = synthesizeQuestionsFromDocument(
@@ -186,6 +195,11 @@ export async function generateExamFromDocument(params: GenerateExamParams): Prom
 
     // Trim or fill exactly to questionCount
     const finalQuestions = generatedQuestions.slice(0, questionCount);
+    for (const question of finalQuestions) {
+        const source = resolveExamSource(question.sourceExcerpt, resourceTexts);
+        if (!source) throw new InvalidSourceReferenceError("An exam question could not be verified against your materials. Please try different materials.");
+        question.sourceExcerpt = source.excerpt;
+    }
 
     const examId = randomUUID();
     const now = new Date().toISOString();
