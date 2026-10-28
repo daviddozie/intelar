@@ -1,9 +1,5 @@
 import { Agent } from "@mastra/core/agent";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-
-const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || "intelar-local-key",
-});
+import { resolveAIModel } from "@/lib/ai-model";
 
 export const LESSON_TUTOR_BASE_INSTRUCTIONS = `You are Intelar's Focused Lesson Tutor — a supportive, encouraging, and academically rigorous personal tutor for university students in Nigeria.
 
@@ -21,5 +17,5 @@ export const lessonTutorAgent = new Agent({
     id: "lesson_tutor_agent",
     name: "Lesson-Tutor",
     instructions: LESSON_TUTOR_BASE_INSTRUCTIONS,
-    model: openrouter(process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini"),
+    model: resolveAIModel,
 });

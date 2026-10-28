@@ -1,3 +1,5 @@
+import { withAIAccess } from "@/lib/ai-access";
+import { aiErrorResponse } from "@/lib/ai-settings-db";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
@@ -19,11 +21,11 @@ export async function POST(request: Request) {
     try {
         const body = outlineRequestSchema.parse(await request.json());
         const resourceTexts = await extractResourceTexts(session.user.email, body.resourceUrls);
-        const lessons = await generateStudyOutline({
+        const lessons = await withAIAccess(session.user.email, () => generateStudyOutline({
             goal: body.goal || "Master the key concepts and practical applications covered in the materials.",
             language: body.language,
             resourceTexts,
-        });
+        }));
 
         const primaryDoc = resourceTexts[0];
         const docBaseName = primaryDoc ? primaryDoc.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ") : "Study Path";
@@ -38,6 +40,6 @@ export async function POST(request: Request) {
             suggestedGoal,
         });
     } catch (error) {
-        return learningErrorResponse(error);
+        return aiErrorResponse(error) ?? learningErrorResponse(error);
     }
 }

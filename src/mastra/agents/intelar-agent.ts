@@ -1,7 +1,7 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { resolveAIModel } from "@/lib/ai-model";
 import { webSearchTool } from "../tools/web-search-tool";
 import { webFetchTool } from "../tools/web-fetch-tool";
 import { sourceRerankTool } from "../tools/source-rerank-tool";
@@ -14,10 +14,6 @@ import { factCheckerAgent } from "./fact-checker-agent";
 import { codeReviewerAgent } from "./code-reviewer-agent";
 import { buildIntelarInstructions } from "./intelar-instructions";
 import { getSystemTemporalContext } from "@/lib/temporal";
-
-const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || "intelar-local-key",
-});
 
 const tursoUrl = process.env.TURSO_DATABASE_URL?.trim();
 
@@ -50,7 +46,7 @@ export const intelarAgent = new Agent({
         }
         return buildIntelarInstructions(getSystemTemporalContext(tz), userName);
     },
-    model: openrouter(process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini"),
+    model: resolveAIModel,
     tools: {
         webSearchTool,
         webFetchTool,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
+import AIAllowanceDialog from "@/components/ai-allowance-dialog";
 import SettingsDialog from "@/components/settings-dialog";
 import HelpDialog from "@/components/help-dialog";
 import { PreferencesProvider } from "@/context/preferences-context";
@@ -62,6 +63,7 @@ export default function RootLayout({
                     <ServiceWorkerRegister />
                     {children}
                     <SettingsDialog />
+                    <AIAllowanceDialog />
                     <HelpDialog />
                     <Toaster position="top-center" />
                   </ChatProvider>

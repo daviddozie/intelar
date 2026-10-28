@@ -1,3 +1,4 @@
+import { hasAIModel } from "@/lib/ai-model";
 import { randomUUID } from "node:crypto";
 import { getUserResourceForChat } from "./db";
 import { getLearningPath, updateLearningPathLessons, LearningNotFoundError } from "./learning-db";
@@ -227,7 +228,7 @@ export async function generateStudyOutline(params: {
     const goalLower = effectiveGoal.toLowerCase();
 
     // Check if OpenRouter model is available
-    if (process.env.OPENROUTER_API_KEY) {
+    if (hasAIModel()) {
         try {
             const { lessonTutorAgent } = await import("@/mastra/agents/lesson-tutor-agent");
             const { z } = await import("zod");
@@ -268,8 +269,8 @@ Respond ONLY with a JSON object in this format (no markdown fences, no explanati
                     return parsed.data.lessons;
                 }
             }
-        } catch (err) {
-            console.warn("AI outline generation failed, falling back to document analysis:", err);
+        } catch {
+            console.warn("AI outline generation failed, falling back to document analysis");
         }
     }
 

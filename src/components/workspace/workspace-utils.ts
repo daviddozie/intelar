@@ -1,3 +1,4 @@
+import { notifyAIAccessRequired, refreshAIUsage } from "@/lib/queries/ai-settings";
 import type { Message } from "@/components/workspace/workspace-types";
 
 export const api = async <T,>(url: string, init?: RequestInit): Promise<T> => {
@@ -7,7 +8,11 @@ export const api = async <T,>(url: string, init?: RequestInit): Promise<T> => {
     headers: { ...(isFormData ? {} : { "Content-Type": "application/json" }), ...init?.headers },
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Request failed");
+  if (init?.method === "POST" && url.endsWith("/messages")) refreshAIUsage();
+  if (!response.ok) {
+    notifyAIAccessRequired(data.code);
+    throw new Error(data.error || "Request failed");
+  }
   return data;
 };
 

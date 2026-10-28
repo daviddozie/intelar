@@ -1,3 +1,4 @@
+import { hasAIModel } from "@/lib/ai-model";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { extractResourceTexts, checkSourceSufficiency } from "./learning-generator";
@@ -126,7 +127,7 @@ export async function generateExamFromDocument(params: GenerateExamParams): Prom
     let generatedQuestions: ExamQuestion[] = [];
 
     // 2. Attempt AI Generation via OpenRouter if key is available
-    if (process.env.OPENROUTER_API_KEY) {
+    if (hasAIModel()) {
         try {
             const { examAgent } = await import("@/mastra/agents/exam-agent");
 
@@ -171,8 +172,8 @@ export async function generateExamFromDocument(params: GenerateExamParams): Prom
                     1
                 );
             }
-        } catch (err) {
-            console.warn("AI exam generation failed, falling back to deterministic document analysis:", err);
+        } catch {
+            console.warn("AI exam generation failed, falling back to deterministic document analysis");
         }
     }
 

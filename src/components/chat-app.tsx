@@ -14,6 +14,9 @@ import { nanoid } from "nanoid";
 import { Moon, Sun, Share2, Loader2 } from "lucide-react";
 import ShareConversationDialog from "@/components/share-conversation-dialog";
 import { toast } from "sonner";
+import { useAISettings } from "@/components/ai-provider-settings";
+import { usePreferences } from "@/context/preferences-context";
+import { aiSettingsKey, notifyAIAccessRequired } from "@/lib/queries/ai-settings";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChat } from "@/context/chat-context";
 import { useSession } from "next-auth/react";
@@ -73,7 +76,9 @@ export default function ChatApp({
   const requestedThreadIdRef = useRef<string | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { status } = useSession();
+  const { status, data: session } = useSession();
+  const aiSettings = useAISettings();
+  const { openSettings } = usePreferences();
   const isAuthenticated = status === "authenticated";
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loginModalMode, setLoginModalMode] = useState<
@@ -180,22 +185,6 @@ export default function ChatApp({
     createNewConversation();
   };
 
-  // Check guest usage on mount
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      const count = parseInt(
-        localStorage.getItem("intelar_guest_prompt_count") || "0",
-        10,
-      );
-      if (count >= 3) {
-        setLoginModalMode("prompt_limit");
-        setShowLoginModal(true);
-      }
-    } else if (status === "authenticated") {
-      setShowLoginModal(false);
-    }
-  }, [status]);
-
   // When initialConversationId is provided, ensure it is active and loaded
   useEffect(() => {
     if (
@@ -212,18 +201,11 @@ export default function ChatApp({
     const hasFiles = files && files.length > 0;
     if ((!content.trim() && !hasFiles) || isStreaming) return;
 
-    // Check guest limit
-    if (!isAuthenticated) {
-      const count = parseInt(
-        localStorage.getItem("intelar_guest_prompt_count") || "0",
-        10,
-      );
-      if (count >= 3) {
-        setLoginModalMode("prompt_limit");
-        setShowLoginModal(true);
-        return;
-      }
-      localStorage.setItem("intelar_guest_prompt_count", String(count + 1));
+    if (status === "loading") return;
+    if (aiSettings.data && !aiSettings.data.configuration && aiSettings.data.remaining === 0) {
+      toast.error("Your free prompts are used up. Configure your own API key to continue.");
+      notifyAIAccessRequired("AI_CONFIGURATION_REQUIRED");
+      return;
     }
 
     // Keep the selected resource attached to this first prompt, then clear the
@@ -411,6 +393,7 @@ export default function ChatApp({
 
       if (!response.ok) {
         const errorBody = await response.json().catch(() => null);
+        notifyAIAccessRequired(errorBody?.code);
         throw new Error(
           errorBody?.error ?? "Failed to get a response. Please try again.",
         );
@@ -492,16 +475,7 @@ export default function ChatApp({
     } finally {
       setIsStreaming(false);
       abortControllerRef.current = null;
-      if (!isAuthenticated) {
-        const count = parseInt(
-          localStorage.getItem("intelar_guest_prompt_count") || "0",
-          10,
-        );
-        if (count >= 3) {
-          setLoginModalMode("prompt_limit");
-          setShowLoginModal(true);
-        }
-      }
+      void queryClient.invalidateQueries({ queryKey: aiSettingsKey(session?.user?.email ?? null) });
     }
   };
 
@@ -616,6 +590,9 @@ export default function ChatApp({
           </span>
 
           <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+            <button className="max-w-36 truncate cursor-pointer rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground" onClick={(event) => { openSettings(event.currentTarget, "ai-provider"); }} title="Configure AI provider and model">
+              {aiSettings.data?.configuration?.model ?? `AI · ${aiSettings.data?.remaining ?? 3} free left`}
+            </button>
             {status === "loading" ? (
               <div
                 className="mr-1 flex items-center gap-1.5"
@@ -769,7 +746,7 @@ export default function ChatApp({
         )}
       </div>
 
-      {/* Login modal (either ChatGPT-style New Chat prompt or 3-prompt trial limit) */}
+      {/* Sign in to save and share conversations. */}
       {shareDialog && (
         <ShareConversationDialog
           key={shareDialog.url}

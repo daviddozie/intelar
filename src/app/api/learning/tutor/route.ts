@@ -1,3 +1,5 @@
+import { withAIAccess } from "@/lib/ai-access";
+import { aiErrorResponse } from "@/lib/ai-settings-db";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
@@ -76,8 +78,7 @@ export async function POST(request: Request) {
 
         const systemPrompt = buildLessonTutorSystemPrompt(lesson);
 
-        // If OpenRouter key is available, use streaming AI
-        if (process.env.OPENROUTER_API_KEY) {
+        return await withAIAccess(session?.user?.email, async () => {
             const { lessonTutorAgent } = await import("@/mastra/agents/lesson-tutor-agent");
 
             const historyText = body.history.length > 0
@@ -108,26 +109,8 @@ export async function POST(request: Request) {
                     "Cache-Control": "no-cache",
                 },
             });
-        }
-
-        // Offline / testing fallback stream
-        const encoder = new TextEncoder();
-        const fallbackText = `I am your focused tutor for **${lesson.title}**.\n\nIn this lesson, we study foundational principles such as:\n> "${lesson.summary}"\n\nTo help you with your question ("*${body.message}*"), remember to check the cited sources and practice questions. Let me know if you would like a hint for a specific question!`;
-
-        const readable = new ReadableStream({
-            start(controller) {
-                controller.enqueue(encoder.encode(fallbackText));
-                controller.close();
-            },
-        });
-
-        return new Response(readable, {
-            headers: {
-                "Content-Type": "text/plain; charset=utf-8",
-                "Cache-Control": "no-cache",
-            },
         });
     } catch (error) {
-        return learningErrorResponse(error);
+        return aiErrorResponse(error) ?? learningErrorResponse(error);
     }
 }

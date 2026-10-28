@@ -1,9 +1,5 @@
 import { Agent } from "@mastra/core/agent";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-
-const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || "intelar-local-key",
-});
+import { resolveAIModel } from "@/lib/ai-model";
 
 export const EXAM_AGENT_BASE_INSTRUCTIONS = `You are Intelar's Senior University Examination Board Examiner and Psychometrics Specialist.
 
@@ -33,5 +29,5 @@ export const examAgent = new Agent({
     id: "exam-agent",
     name: "Exam-Agent",
     instructions: EXAM_AGENT_BASE_INSTRUCTIONS,
-    model: openrouter(process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini"),
+    model: resolveAIModel,
 });

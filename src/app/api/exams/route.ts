@@ -1,3 +1,5 @@
+import { withAIAccess } from "@/lib/ai-access";
+import { aiErrorResponse } from "@/lib/ai-settings-db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { listExamPreps } from "@/lib/exam-db";
@@ -32,19 +34,22 @@ export async function POST(request: Request) {
         const body = await request.json();
         const input = createExamInputSchema.parse(body);
 
-        const exam = await generateExamFromDocument({
-            userEmail: session.user.email,
+        const userEmail = session.user.email;
+        const exam = await withAIAccess(userEmail, () => generateExamFromDocument({
+            userEmail,
             resourceUrls: input.resourceUrls,
             difficulty: input.difficulty,
             questionCount: input.questionCount,
             timeLimitMinutes: input.timeLimitMinutes,
             title: input.title,
             courseName: input.courseName,
-        });
+        }));
 
         return Response.json({ exam }, { status: 201 });
     } catch (error) {
-        console.error("Failed to generate exam:", error);
+        const accessError = aiErrorResponse(error);
+        if (accessError) return accessError;
+        console.error("Failed to generate exam");
         return Response.json(
             { error: error instanceof Error ? error.message : "Failed to generate exam" },
             { status: 400 }

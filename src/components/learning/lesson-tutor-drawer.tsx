@@ -1,5 +1,7 @@
 "use client";
 
+import { notifyAIAccessRequired, refreshAIUsage } from "@/lib/queries/ai-settings";
+
 import { usePreferences } from "@/context/preferences-context";
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
@@ -82,6 +84,7 @@ export default function LessonTutorDrawer({
 
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
+                notifyAIAccessRequired(errData.code);
                 throw new Error(errData.error || `Tutor service error (${res.status})`);
             }
 
@@ -109,6 +112,7 @@ export default function LessonTutorDrawer({
                 )
             );
         } finally {
+            refreshAIUsage();
             setIsLoading(false);
         }
     }
