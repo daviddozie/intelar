@@ -1,6 +1,6 @@
 # Intelar Learning Implementation Plan
 
-Read SPEC.md and AGENTS.md before implementation.
+Read SPEC.md before implementation.
 Preserve unrelated changes and existing functionality.
 
 ## Milestone 1: Establish a reliable foundation

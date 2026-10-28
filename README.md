@@ -6,7 +6,6 @@
     <img src="https://img.shields.io/badge/Mastra-1.3-blueviolet" alt="Mastra" />
     <img src="https://img.shields.io/badge/TypeScript-5-blue?logo=typescript" alt="TypeScript" />
     <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" />
-    <img src="https://img.shields.io/badge/Built%20with-OpenAI%20Codex-412991?logo=openai" alt="Built with OpenAI Codex" />
   </p>
 </div>
 
@@ -298,12 +297,6 @@ npm run dev:all
 | `npm run check:offline` | Test offline study pack downloads and attempt sync |
 | `npm run check:revision` | Test exam revision plan generation and validation |
 | `npm run check:seo` | Validate canonical URLs, robots.txt, and metadata tags |
-
----
-
-## 🤖 Built with OpenAI Codex
-
-Intelar was developed with the assistance of **OpenAI Codex**, leveraging AI-assisted coding and agentic workflows to build, test, and refine its full-stack architecture.
 
 ---
 
