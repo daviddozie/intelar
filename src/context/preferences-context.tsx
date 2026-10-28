@@ -27,6 +27,7 @@ import { queryKeys } from "@/lib/queries/keys";
 type SaveStatus = "loading" | "saving" | "saved" | "local" | "error";
 export const settingsSections = [
   "appearance",
+  "ai-provider",
   "account",
   "accessibility",
   "storage",
@@ -45,7 +46,7 @@ type PreferenceContext = {
   storageAvailable: boolean;
   updatePreferences: (patch: Partial<UserPreferences>) => void;
   retry: () => void;
-  openSettings: (trigger?: HTMLElement) => void;
+  openSettings: (trigger?: HTMLElement, section?: SettingsSection) => void;
   closeSettings: () => void;
   settingsOpen: boolean;
   settingsSection: SettingsSection;
@@ -324,10 +325,11 @@ function AccountPreferences({
           if (settingsOpen) updateSettingsUrl(section);
         },
         settingsTrigger,
-        openSettings: (trigger) => {
+        openSettings: (trigger, section) => {
           settingsTrigger.current =
             trigger ?? (document.activeElement as HTMLElement);
-          updateSettingsUrl(settingsSection, !settingsOpen);
+          if (section) setSettingsSectionState(section);
+          updateSettingsUrl(section ?? settingsSection, !settingsOpen);
           setSettingsOpen(true);
         },
         closeSettings: () => {

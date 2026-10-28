@@ -411,7 +411,8 @@ function WorkspaceDetailContent({
         }
       }
       setError("");
-    } catch {
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not send message");
       setLiveMessages((current) => mergeMessages(current, [{ ...pending, deliveryStatus: "failed" }]));
       const timer = intelarPendingRef.current.get(clientMessageId);
       if (timer) clearTimeout(timer);

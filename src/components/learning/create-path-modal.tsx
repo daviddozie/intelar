@@ -1,5 +1,7 @@
 "use client";
 
+import { notifyAIAccessRequired, refreshAIUsage } from "@/lib/queries/ai-settings";
+
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
@@ -119,6 +121,7 @@ export default function CreatePathModal({
 
             const data = await res.json();
             if (!res.ok) {
+                notifyAIAccessRequired(data.code);
                 throw new Error(data.error || "Could not generate outline");
             }
 
@@ -134,6 +137,7 @@ export default function CreatePathModal({
         } catch (err: unknown) {
             setErrorMessage(err instanceof Error ? err.message : "Failed to suggest outline");
         } finally {
+            refreshAIUsage();
             setIsSuggestingOutline(false);
         }
     }
@@ -224,6 +228,7 @@ export default function CreatePathModal({
         } catch (err: unknown) {
             setErrorMessage(err instanceof Error ? err.message : "Failed to generate study path");
         } finally {
+            refreshAIUsage();
             setIsGenerating(false);
         }
     }

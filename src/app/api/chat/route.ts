@@ -1,3 +1,6 @@
+import { prepareAIAccess } from "@/lib/ai-access";
+import { aiErrorResponse } from "@/lib/ai-settings-db";
+import { runWithAIModel } from "@/lib/ai-model";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { NextRequest } from "next/server";
@@ -56,7 +59,9 @@ export async function POST(req: NextRequest) {
     const userEmail = session?.user?.email ?? "guest";
     const userName = session?.user?.name ?? undefined;
 
-    const body = await req.json();
+    let body;
+    try { body = await req.json(); } catch { return Response.json({ error: "Invalid JSON body" }, { status: 400 }); }
+    if (!body || typeof body !== "object") return Response.json({ error: "Invalid request" }, { status: 400 });
     const { message, threadId, files, useResearch, referenceResource } = body;
     const userTimezone =
         body.timezone ||
@@ -88,6 +93,11 @@ export async function POST(req: NextRequest) {
         }
         ownedReference = await getUserResourceForChat(session.user.email, referenceResource.url);
         if (!ownedReference) return Response.json({ error: "Resource not found" }, { status: 404 });
+    }
+
+    let access;
+    try { access = await prepareAIAccess(session?.user?.email); } catch (error) {
+        return aiErrorResponse(error) ?? databaseErrorResponse(error) ?? Response.json({ error: "Could not check AI access" }, { status: 503 });
     }
 
     // Search Pinecone for relevant document chunks (RAG)
@@ -177,7 +187,7 @@ export async function POST(req: NextRequest) {
     const shouldUseResearch =
         !isFileQuestion && (useResearch === true || (useResearch !== false && isResearchQuery(message, userTimezone)));
 
-    (async () => {
+    runWithAIModel(access.credentials, async () => {
         try {
             if (isFileQuestion && hasRagContext) {
                 await streamAgent(agent, fullMessage, threadId, userEmail, userTimezone, userName, writer, encoder);
@@ -259,7 +269,7 @@ export async function POST(req: NextRequest) {
                 (typeof err === "object" && err !== null && "name" in err && (err as { name: string }).name === "ResponseAborted");
 
             if (!isAbort) {
-                console.error("Chat route error:", err);
+                console.error("Chat route error");
                 try {
                     await writer.write(
                         encoder.encode("\n\nSorry, something went wrong. Please try again.")
@@ -275,7 +285,7 @@ export async function POST(req: NextRequest) {
                 // Stream might already be closed or aborted
             }
         }
-    })().catch(() => {});
+    }).catch(() => {});
 
     return new Response(readable, {
         headers: {
@@ -382,26 +392,9 @@ async function streamAgent(
             (typeof err === "object" && err !== null && "name" in err && (err as { name: string }).name === "ResponseAborted");
         if (isAbort) return;
 
-        const msg = err instanceof Error ? err.message : String(err);
-        if (msg.includes("429") || msg.toLowerCase().includes("rate limit")) {
-            await writer.write(
-                encoder.encode(
-                    "**Daily rate limit reached** — the model quota has been reached.\n\n" +
-                    "The limit resets at **midnight UTC**. You can also:\n" +
-                    "- Add credits on [OpenRouter](https://openrouter.ai) to unlock higher limits\n" +
-                    "- Switch to a different model in your `.env.local` (`OPENROUTER_MODEL`)\n\n" +
-                    "In the meantime, **uploaded documents are still searchable** — your files are stored and will be ready when the limit resets."
-                )
-            ).catch(() => {});
-        } else if (msg.includes("unavailable") || msg.includes("AI_APICallError") || msg.toLowerCase().includes("openrouter")) {
-            await writer.write(
-                encoder.encode(
-                    `**LLM Provider Error:** ${msg}\n\n` +
-                    "You can switch the model by setting `OPENROUTER_MODEL` in your `.env.local` (e.g. `OPENROUTER_MODEL=openai/gpt-4o-mini` or `openai/gpt-4o`)."
-                )
-            ).catch(() => {});
-        } else {
-            throw err; 
-        }
+        if (inThinkBlock) await writer.write(encoder.encode("</think>\n\n")).catch(() => {});
+        await writer.write(encoder.encode(
+            "**The AI provider could not complete this request.** Check your API key, model ID, provider balance, and model support for tools in Settings → AI provider, then try again."
+        )).catch(() => {});
     }
 }

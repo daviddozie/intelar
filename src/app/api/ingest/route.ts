@@ -1,3 +1,5 @@
+import { withAIAccess } from "@/lib/ai-access";
+import { aiErrorResponse } from "@/lib/ai-settings-db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { processDocument } from "@/lib/document-processor";
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
         const results = await mapWithConcurrency(files, 2, async (file) => {
                 const buffer = Buffer.from(await file.arrayBuffer());
                 const processed = file.type.startsWith("image/")
-                    ? await processImage(buffer, file.type)
+                    ? await withAIAccess(session.user!.email!, () => processImage(buffer, file.type), { charge: false, vision: true })
                     : await processDocument(buffer, file.name, file.type);
 
                 // Clean up previous vector chunks for this file in this conversation first to prevent duplicates/orphans
@@ -75,6 +77,8 @@ export async function POST(req: NextRequest) {
 
         return Response.json({ success: true, files: results });
     } catch (err) {
+        const accessError = aiErrorResponse(err);
+        if (accessError) return accessError;
         if (err instanceof ConversationAccessError) {
             return Response.json({ error: "Conversation not found" }, { status: 404 });
         }

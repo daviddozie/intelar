@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import AIProviderSettings from "@/components/ai-provider-settings";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +13,7 @@ import {
   Eye,
   HardDrive,
   Palette,
+  KeyRound,
 } from "lucide-react";
 import {
   Dialog,
@@ -37,6 +39,7 @@ import {
 } from "@/lib/offline-learning-store";
 
 const sections: { id: SettingsSection; label: string; icon: typeof Palette }[] = [
+  { id: "ai-provider", label: "AI provider", icon: KeyRound },
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "account", label: "Account", icon: UserRound },
   { id: "accessibility", label: "Accessibility", icon: Eye },
@@ -152,6 +155,7 @@ function SettingsSections() {
           <h2 className="text-lg font-semibold">
             {sections.find((item) => item.id === section)?.label}
           </h2>
+          {section === "ai-provider" && <AIProviderSettings />}
           {section === "appearance" && (
             <>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">

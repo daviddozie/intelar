@@ -1,5 +1,7 @@
 "use client";
 
+import { notifyAIAccessRequired, refreshAIUsage } from "@/lib/queries/ai-settings";
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
     Dialog,
@@ -220,6 +222,7 @@ export default function CreateExamModal({
                 } catch {
                     // Ignore transient network errors during poller
                 } finally {
+            refreshAIUsage();
                     isCheckingCompletionRef.current = false;
                 }
 
@@ -477,6 +480,7 @@ export default function CreateExamModal({
 
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
+                notifyAIAccessRequired(errData.code);
                 throw new Error(errData.error || "Failed to upload document");
             }
 
@@ -493,6 +497,7 @@ export default function CreateExamModal({
         } catch (err) {
             setErrorMessage(err instanceof Error ? err.message : "Failed to upload document");
         } finally {
+            refreshAIUsage();
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
         }
@@ -546,6 +551,7 @@ export default function CreateExamModal({
 
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
+                notifyAIAccessRequired(data.code);
                 throw new Error(data.error || "Failed to generate exam.");
             }
 
@@ -561,6 +567,7 @@ export default function CreateExamModal({
                 }
             }, 3000);
         } finally {
+            refreshAIUsage();
             inFlightFetchRef.current = false;
         }
     }

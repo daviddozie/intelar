@@ -1,3 +1,6 @@
+import { prepareAIAccess } from "@/lib/ai-access";
+import { aiErrorResponse } from "@/lib/ai-settings-db";
+import { runWithAIModel } from "@/lib/ai-model";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getDB, saveUserResources } from "@/lib/db";
@@ -69,6 +72,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ workspa
     return Response.json({ error: "The reply target is invalid" }, { status: 400 });
   const existing = await getWorkspaceMessageByClientId(workspaceId, session.user.email, clientMessageId);
   if (existing) return Response.json(existing, { status: 200 });
+  let aiAccess: Awaited<ReturnType<typeof prepareAIAccess>> | undefined;
+  if (/(^|\s)@intelar\b/i.test(content)) {
+    try { aiAccess = await prepareAIAccess(session.user.email); }
+    catch (error) { return aiErrorResponse(error) ?? Response.json({ error: "Could not check AI access" }, { status: 503 }); }
+  }
   const storedAttachments: StoredWorkspaceMessageAttachment[] = [];
   if (files.length) {
     cloudinary.config({ cloud_name: process.env.CLOUDINARY_CLOUD_NAME, api_key: process.env.CLOUDINARY_API_KEY, api_secret: process.env.CLOUDINARY_API_SECRET });
@@ -137,7 +145,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ workspa
     catch (error) { console.error("Workspace realtime broadcast failed", error instanceof Error ? error.message : "unknown error"); }
   }
   if (inserted && /(^|\s)@intelar\b/i.test(content)) {
-    after(async () => {
+    after(async () => runWithAIModel(aiAccess!.credentials, async () => {
       const assistantMessageId = `intelar-reply-${message.id}`;
       const createdAt = new Date().toISOString();
       let broadcaster: ReturnType<typeof createWorkspaceRealtimeBroadcaster> | undefined;
@@ -291,7 +299,7 @@ ${context}`;
       } finally {
         if (broadcaster) await broadcaster.close();
       }
-    });
+    }));
   }
   return Response.json(message, { status: inserted ? 201 : 200 });
 }

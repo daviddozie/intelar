@@ -1,5 +1,5 @@
 import { Agent } from "@mastra/core/agent";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { resolveAIModel } from "@/lib/ai-model";
 import { webSearchTool } from "../tools/web-search-tool";
 import { webFetchTool } from "../tools/web-fetch-tool";
 import {
@@ -7,10 +7,6 @@ import {
     buildTemporalGroundingInstructions,
     getSystemTemporalContext,
 } from "@/lib/temporal";
-
-const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || "intelar-local-key",
-});
 
 export function buildFactCheckerInstructions(temporalContext?: TemporalContext): string {
     const temporalBlock = buildTemporalGroundingInstructions(
@@ -70,6 +66,6 @@ export const factCheckerAgent = new Agent({
         }
         return buildFactCheckerInstructions(getSystemTemporalContext(tz));
     },
-    model: openrouter(process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini"),
+    model: resolveAIModel,
     tools: { webSearchTool, webFetchTool },
 });
